@@ -91,10 +91,11 @@ main().then((res)=>{
 app.listen(8080,(req,res)=>{
     console.log("server is listening to port 8080")
 })
-
-// app.get("/",(req,res)=>{
-//     res.send("Hey i am root")
-// })
+// app.get('/')
+app.get("/",(async(req,res)=>{
+    const alllistings=await Listing.find({})
+    res.render("listings/index.ejs",{alllistings})
+}))
 
 // Rendering the Basic Routes
 
