@@ -97,6 +97,21 @@ app.get("/",(async(req,res)=>{
     res.render("listings/index.ejs",{alllistings})
 }))
 
+app.get("/listings/search",async(req,res)=>{
+    let searchvar=req.query.search;
+    let searchedlisting=await Listing.findOne({title:searchvar});
+    
+    if (searchedlisting){
+        let foundid=searchedlisting._id;
+        console.log(foundid);
+        res.redirect(`/listings/${foundid}`);
+
+    }else{
+        req.flash("error","Listing not found")
+        res.redirect('/listings')
+    }
+    
+})
 // Rendering the Basic Routes
 
 app.use("/listings",listingRouter);
