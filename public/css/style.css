@@ -120,3 +120,24 @@ body{
     width:100vh;
     
 }
+@media (max-width: 767.98px) {
+    #map {
+        /* Smaller Height for mobile */
+        height: 300px; /* Adjust this value (e.g., 200px or 300px) */
+        
+        /* Width should generally be 100% of the container for responsive design */
+        width: 200px;
+        
+        /* If you truly want a fixed, smaller width, you could use a percentage of the viewport: */
+        /* width: 90vw; */
+    }
+}
+@media (max-width: 767.98px) {
+    .btns {
+        /* Change flex to block display to allow full-width elements to stack */
+        display: block; 
+        /* OR use display: flex and flex-direction: column; if you prefer flex control */
+        /* display: flex; 
+        flex-direction: column; */
+    }
+}

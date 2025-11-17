@@ -40,10 +40,10 @@
     <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
 
     <div class="btns">
-    <a href="/listings/<%=listing._id%>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
+    <a href="/listings/<%=listing._id%>/edit" class="btn btn-dark col-4 offset-4 col-md-1 offset-md-3 mb-2 edit-btn">Edit</a>
     
     <form method="POST" action="/listings/<%=listing.id%>?_method=DELETE">
-        <button class="btn btn-dark offset-5">Delete</button>
+        <button class="btn btn-dark col-4 offset-4 offset-md-5">Delete</button>
     </form>
 
 
@@ -106,7 +106,7 @@
             <p><b>All Reviews</b></p>
         <% for (review of listing.reviews){ %>
             
-           <div class="card  col-5 ms-3 mb-3">
+           <div class="card col-12 col-md-5 ms-3 mb-3">
             <div class="card-body">
                 <h5 class="card-title">@ <%=review.author.username%></h5>
                   <p class="starability-result card-text" data-rating=<%=review.rating%>></p>
@@ -126,7 +126,7 @@
        </div>
        <%}%>
     </div>
-    <div class="col-6 offset-3 mt-3 mb-3">
+    <div class="col-4 offset-4 col-md-6 offset-md-3 mt-3 mb-3">
         <h3>Where you'll be</h3>
         <div id="map"></div>
         
