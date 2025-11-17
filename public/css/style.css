@@ -108,6 +108,7 @@ body{
 
 .btns{
     display:flex;
+    flex-wrap: wrap;
 
 }
 
