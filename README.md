@@ -1,233 +1,300 @@
-# 🏡 BookVilla
+<div align="center">
 
-### Full-Stack Luxury Rental Platform
+# 🏡 BookVilla — Full-Stack Vacation Rental Platform
 
-BookVilla is a production-ready full-stack rental marketplace that enables property owners to showcase luxury properties and allows users to discover, review, and manage listings seamlessly.
+### A modern, production-ready property booking application built with the MEN stack (MongoDB, Express.js, Node.js)
 
-🔗 **Live Demo:** https://book-villa.vercel.app
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![EJS](https://img.shields.io/badge/EJS-Templating-A91E50?style=for-the-badge&logo=ejs&logoColor=white)](https://ejs.co/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Images-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com/)
+[![Mapbox](https://img.shields.io/badge/Mapbox-Maps-000000?style=for-the-badge&logo=mapbox&logoColor=white)](https://www.mapbox.com/)
+
+[🌐 Live Site](#) <!-- Add live link here when deployed -->
+
+</div>
 
 ---
 
-## 🚀 Overview
+## 📌 About
 
-BookVilla is a modern rental platform built using the MERN stack. It provides a secure and scalable environment where users can browse properties worldwide, leave reviews, upload images, and manage listings through role-based access control.
+**BookVilla** is a full-stack web application designed for booking vacation rentals, properties, and experiences (inspired by Airbnb). It allows users to browse worldwide properties, view their exact locations on interactive maps, leave reviews, and host their own properties. 
 
-The project focuses on real-world software engineering practices including authentication, authorization, cloud media storage, interactive mapping, and responsive user experience.
+Built using a robust monolithic architecture with server-side rendering, secure authentication, and cloud integrations for imagery and geocoding.
 
 ---
 
 ## ✨ Features
 
-### 👤 Authentication & Authorization
+### 🏕️ Property Exploration
+- Browse diverse listings across categories (Trending, Rooms, Iconic Cities, Mountains, Castles, Amazing Pools, Camping, Farms, etc.)
+- **Global Search Bar** — Instantly search and filter properties by name.
+- Interactive **Mapbox Integration** — View exact coordinates and location markers for every property on a dynamic map.
+- **Dynamic Pricing** — Real-time tax toggle to view prices with or without GST.
+- Flash **Toasts & Notifications** for successes, warnings, and errors.
+- Fully responsive UI using Bootstrap and custom CSS.
 
-* Secure user registration and login
-* JWT-based authentication
-* Role-based access control
-* Protected routes
-* Session management
+### 🔐 User & Host Experience
+- **Protected Authentication** — Secure login/signup via `passport-local-mongoose`.
+- **Session Management** — Persistent sessions across page reloads using MongoDB store.
+- Authorized hosts can create, edit, and delete their own property listings.
+- Image uploads are seamlessly managed and optimized using **Cloudinary**.
+- Users can leave ratings and reviews on properties they have visited.
+- Authorization checks ensure users can only modify/delete their own reviews and listings.
 
-### 🏠 Property Listings
+### 🔌 Robust Backend
+- Built on a RESTful MVC (Model-View-Controller) architecture using Express.js.
+- MongoDB Atlas for a scalable, cloud-native NoSQL database.
+- Data validation and error handling using Joi.
+- Military-grade session security and password hashing.
 
-* Create new property listings
-* Edit existing listings
-* Delete listings
-* View detailed property information
-* Image gallery support
+---
 
-### 🌍 Interactive Mapping
+## 🏗️ System Architecture
 
-* MapBox integration
-* Geographical location visualization
-* Interactive map markers
-* Global property discovery
+```mermaid
+graph TB
+    subgraph Client["🌐 Client Layer"]
+        UI["💻 User Interface<br/><i>HTML, CSS, Bootstrap, EJS</i>"]
+    end
 
-### ☁️ Cloud Media Storage
+    subgraph Server["⚙️ Server Layer"]
+        API["🔌 Backend Application<br/><i>Node.js, Express.js</i>"]
+    end
 
-* Cloudinary integration
-* Secure image uploads
-* Optimized image delivery
-* Cloud-based asset management
+    subgraph Cloud["☁️ Cloud Services"]
+        DB[("🗄️ MongoDB Atlas<br/><i>Database</i>")]
+        CDN["🖼️ Cloudinary<br/><i>Image CDN</i>"]
+        MAP["🗺️ Mapbox<br/><i>Geocoding API</i>"]
+    end
 
-### ⭐ Reviews & Ratings
+    UI -->|"HTTP Requests"| API
+    API -->|"CRUD Operations"| DB
+    API -->|"Image Uploads"| CDN
+    API -->|"Forward Location Data"| MAP
+    UI -->|"Load Interactive Maps"| MAP
+    UI -->|"Load Optimized Images"| CDN
+```
 
-* User-generated reviews
-* Rating system
-* Review management
-* Dynamic feedback display
+---
 
-### 🔍 Search Functionality
+## 🔄 Request Flow
 
-* Search properties efficiently
-* Fast property discovery
-* Improved user navigation
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant C as 💻 Client (EJS)
+    participant S as ⚙️ Express Server
+    participant DB as 🗄️ MongoDB
+    participant CL as 🖼️ Cloudinary
+    participant M as 🗺️ Mapbox
 
-### 🛡️ Security
-
-* Authentication middleware
-* Authorization checks
-* Input validation
-* Error handling
-* Flash messaging
+    Note over U,M: Creating a New Property Listing
+    U->>C: Fill Form + Upload Image
+    C->>S: POST /listings (multipart/form-data)
+    S->>CL: Upload image to Cloudinary
+    CL-->>S: Return secure_url & filename
+    S->>M: Geocoding request (Location string)
+    M-->>S: Return GeoJSON coordinates
+    S->>DB: Save new Listing (details, image URL, coords)
+    DB-->>S: Confirmation
+    S-->>C: Redirect to /listings/:id
+    C-->>U: Display new listing & success flash
+```
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
+| Layer | Technology | Purpose |
+|:---:|:---|:---|
+| **Frontend UI** | HTML5, CSS3, Bootstrap 5 | Responsive layout and styling |
+| **Templating** | EJS (Embedded JavaScript), EJS-Mate | Server-side HTML generation |
+| **Backend** | Node.js, Express.js | Application server & routing |
+| **Database** | MongoDB Atlas, Mongoose | Cloud NoSQL database & ORM |
+| **Authentication** | Passport.js, Express-Session | Secure local strategy auth |
+| **Cloud Storage** | Cloudinary, Multer | Image hosting & multipart parsing |
+| **Geocoding** | Mapbox SDK | Forward geocoding & interactive maps |
 
-* HTML5
-* CSS3
-* Bootstrap
-* JavaScript (ES6+)
+---
 
-### Backend
+## 📂 Project Structure
 
-* Node.js
-* Express.js
+```
+BookVilla/
+├── controllers/               # Route logic separated from routing
+├── init/                      # Database initialization and seed data
+├── models/                    # Mongoose schemas
+│   ├── listing.js             # Property listing schema
+│   ├── review.js              # Review schema
+│   └── user.js                # User schema
+├── public/                    # Static assets (CSS, JS, Images)
+├── routes/                    # Express routers
+│   ├── listing.js             # Listing CRUD routes
+│   ├── review.js              # Review CRUD routes
+│   └── user.js                # Authentication routes
+├── utils/                     # Error handling and async wrappers
+├── views/                     # EJS templates
+│   ├── includes/              # Partials (Navbar, Footer, Flash)
+│   ├── layouts/               # Boilerplate layouts
+│   ├── listings/              # Listing views (Index, Show, Edit, New)
+│   └── users/                 # Auth views (Login, Signup)
+├── app.js                     # Main server entrypoint
+├── middleware.js              # Auth & validation middlewares
+├── cloudConfig.js             # Cloudinary configuration
+└── schema.js                  # Joi validation schemas
+```
 
-### Database
+---
 
-* MongoDB
-* Mongoose
+## 🔌 API Reference (Internal MVC Routes)
 
-### Cloud Services
+### Listings
 
-* Cloudinary
-* MapBox
+| Method | Endpoint | Description | Auth Required |
+|:---:|:---|:---|:---:|
+| `GET` | `/listings` | Show all properties | ❌ |
+| `GET` | `/listings/search` | Search for a specific property | ❌ |
+| `GET` | `/listings/new` | Render form to create property | ✅ |
+| `POST` | `/listings` | Add new property | ✅ |
+| `GET` | `/listings/:id` | View property details & map | ❌ |
+| `GET` | `/listings/:id/edit`| Render form to edit property | ✅ (Owner) |
+| `PUT` | `/listings/:id` | Update property | ✅ (Owner) |
+| `DELETE`| `/listings/:id` | Delete property | ✅ (Owner) |
+
+### Reviews
+
+| Method | Endpoint | Description | Auth Required |
+|:---:|:---|:---|:---:|
+| `POST` | `/listings/:id/reviews` | Leave a rating and review | ✅ |
+| `DELETE`| `/listings/:id/reviews/:reviewId`| Delete a review | ✅ (Author) |
 
 ### Authentication
 
-* JWT (JSON Web Tokens)
-* Passport.js
-
-### Deployment
-
-* Vercel
-
----
-
-## 📊 Performance Metrics
-
-| Metric                    | Score |
-| ------------------------- | ----- |
-| Lighthouse Best Practices | 100   |
-| SEO                       | 91    |
-| First Contentful Paint    | 1.4s  |
-| Cumulative Layout Shift   | 0.002 |
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `GET` | `/signup` | Render signup form |
+| `POST` | `/signup` | Register a new user |
+| `GET` | `/login` | Render login form |
+| `POST` | `/login` | Authenticate user |
+| `GET` | `/logout` | Terminate session |
 
 ---
 
-## 🏗️ Project Architecture
+## 🚀 Getting Started
 
-```text
-Client
-   │
-   ▼
-Express Server
-   │
- ┌─┴───────────────┐
- │                 │
- ▼                 ▼
-MongoDB        Cloudinary
-(Database)     (Images)
-   │
-   ▼
-MapBox API
-(Location Services)
-```
+### Prerequisites
 
----
+- **Node.js** v18+
+- **MongoDB Atlas** account (or local MongoDB)
+- **Cloudinary** account
+- **Mapbox** Developer account
 
-## 📸 Screenshots
-
-### Home Page
-
-<img width="1896" height="967" alt="thumbnail2" src="https://github.com/user-attachments/assets/51fd5885-2a33-4e3d-9c18-33535b9d174f" />
-
-
-### Property Listing
-
-<img width="1904" height="852" alt="image" src="https://github.com/user-attachments/assets/10f674a9-6a04-466d-aeea-f2094f6fcf58" />
-
-
-### Interactive Map
-
-<img width="1229" height="757" alt="image" src="https://github.com/user-attachments/assets/a0d0bf81-fdb7-4460-95e7-58319cf6aed9" />
-
-
-### Review System
-
-<img width="1369" height="709" alt="image" src="https://github.com/user-attachments/assets/a5370baa-7934-4497-bc49-53f9317c950d" />
-
-
----
-
-## ⚙️ Installation
-
-### Clone Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/BookVilla.git
-```
-
-### Navigate to Project
-
-```bash
+git clone https://github.com/iZiaur/BookVilla.git
 cd BookVilla
 ```
 
-### Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Configure Environment Variables
+### 3. Configure Environment Variables
 
-Create a `.env` file:
+Create a `.env` file in the root directory:
 
 ```env
-MONGO_URI=your_mongodb_connection
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_KEY=your_key
-CLOUDINARY_SECRET=your_secret
-MAPBOX_TOKEN=your_mapbox_token
-SECRET=your_session_secret
+ATLASDB_URL=your_mongodb_connection_string
+SECRET=your_express_session_secret
+CLOUD_NAME=your_cloudinary_cloud_name
+CLOUD_API_KEY=your_cloudinary_api_key
+CLOUD_API_SECRET=your_cloudinary_api_secret
+MAP_TOKEN=your_mapbox_public_token
 ```
 
-### Run Development Server
+### 4. Initialize Database (Optional)
+
+If you want to seed your database with initial sample data:
+```bash
+cd init
+node index.js
+cd ..
+```
+
+### 5. Start the Server
 
 ```bash
 npm start
+# or use nodemon:
+nodemon app.js
+```
+
+> Server runs locally at `http://localhost:8080`
+
+---
+
+## 📊 Database Schema
+
+```mermaid
+erDiagram
+    LISTINGS {
+        ObjectId _id PK
+        String title
+        String description
+        Object image
+        String price
+        String location
+        String country
+        Object geometry
+    }
+
+    USERS {
+        ObjectId _id PK
+        String username UK
+        String email
+        String password
+    }
+
+    REVIEWS {
+        ObjectId _id PK
+        String comment
+        Number rating
+        Date createdAt
+    }
+
+    USERS ||--o{ LISTINGS : "owns"
+    USERS ||--o{ REVIEWS : "writes"
+    LISTINGS ||--o{ REVIEWS : "contains"
 ```
 
 ---
 
-## 🎯 Future Enhancements
+## 🤝 Contributing
 
-* Property category filtering
-* Advanced search functionality
-* Booking system
-* Payment gateway integration
-* Wishlist functionality
-* User dashboard analytics
-* Mobile-first optimization
-* Real-time notifications
+Contributions are always welcome! 
 
----
-
-## 👨‍💻 Author
-
-### Md Ziaur Rahman
-
-Full Stack Developer | MERN Stack Engineer
-
-* Portfolio: https://portfolio-ziaur.vercel.app
-* LinkedIn: https://linkedin.com/in/md-ziaur-rahman-01031228a
-* GitHub: https://github.com/iZiaur
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
-## ⭐ Support
+## 📄 License
 
-If you found this project useful, consider giving it a star on GitHub.
+This project is open source and available under the [ISC License](LICENSE).
+
+---
+
+<div align="center">
+
+**Built with ❤️ by [Ziaur Rahman](https://github.com/iZiaur)**
+
+⭐ Star this repo if you found it helpful!
+
+</div>
