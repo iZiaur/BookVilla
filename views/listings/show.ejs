@@ -18,6 +18,7 @@
      
         <p class="card-text mt-3">
             <p class="class-text">Owned by <i><%=listing.owner.username%></i></p>
+            <p class="card-text text-muted" style="font-size: 0.9rem;"><i class="fa-regular fa-clock me-1"></i> Added on <%=listing._id.getTimestamp().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })%></p>
             <p class="card-text"> <%=listing.description%></p>
            <p class="card-text"> &#8377; <%=listing.price.toLocaleString("en-IN")%></p>
             <p class="card-text"><%=listing.location%></p>
