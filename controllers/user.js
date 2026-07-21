@@ -32,7 +32,12 @@ module.exports.renderLoginForm=(req,res)=>{
 }
 module.exports.login=async(req,res)=>{
     req.flash('success','You are logged in!');
-    redirectUrl=res.locals.redirectUrl||'/listings'
+    
+    if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
+        return res.redirect('/admin');
+    }
+    
+    let redirectUrl=res.locals.redirectUrl||'/listings'
     res.redirect(redirectUrl)
 }
 module.exports.logout=(req,res,next)=>{

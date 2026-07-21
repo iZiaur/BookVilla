@@ -20,6 +20,21 @@ module.exports.saveRedirectUrl = (req, res, next) => {
     next();  
 };
 
+module.exports.isAdmin = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        req.session.redirectUrl = req.originalUrl;  
+        req.flash('error', 'You must be logged in');
+        return res.redirect('/login');
+    }
+    
+    if (req.user.email !== process.env.ADMIN_EMAIL) {
+        req.flash('error', 'You do not have permission to access the admin panel');
+        return res.redirect('/listings');
+    }
+    
+    next();
+};
+
 module.exports.isOwner=async(req,res,next)=>{
     let {id}=req.params;
     let checkListing= await Listing.findById(id);
