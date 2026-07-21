@@ -50,7 +50,19 @@
         <a class="nav-link" href="/login"><b>Log in</b></a>
           <%}%>
           <% if(currUser){ %>
-        <a class="nav-link" href="/logout"><b>Log out</b></a>
+            <div class="nav-item dropdown ms-2">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-user-circle fs-5"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item fw-semibold" href="/profile"><i class="fa-solid fa-id-badge me-2 text-primary"></i>Your Profile</a></li>
+                <% if(currUser.username === 'admin' || (process.env.ADMIN_EMAIL && currUser.email === process.env.ADMIN_EMAIL)) { %>
+                  <li><a class="dropdown-item fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-2 text-warning"></i>Admin Panel</a></li>
+                <% } %>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item fw-semibold text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Log out</a></li>
+              </ul>
+            </div>
          <% } %>
         
       

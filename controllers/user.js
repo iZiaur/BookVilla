@@ -1,4 +1,6 @@
 let User=require("../models/user.js");
+let Listing=require("../models/listing.js");
+
 module.exports.renderSignUpForm=(req,res)=>{
     res.redirect('/login?mode=signup');
 }
@@ -50,3 +52,13 @@ module.exports.logout=(req,res,next)=>{
         res.redirect('/listings');
      })
 }
+
+module.exports.renderProfile = async (req, res) => {
+    // Fetch user's listings and populate reviews
+    const listings = await Listing.find({ owner: req.user._id }).populate({
+        path: 'reviews',
+        populate: { path: 'author' }
+    });
+    
+    res.render('users/profile.ejs', { listings });
+};

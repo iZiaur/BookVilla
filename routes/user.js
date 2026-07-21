@@ -3,8 +3,10 @@ let router=express.Router({mergeParams:true});
 let User=require("../models/user.js");
 const wrapAsync = require("../utils/wrapAsync");
 let passport=require('passport');
-const { saveRedirectUrl } = require("../middleware.js");
+const { saveRedirectUrl, isLoggedIn } = require("../middleware.js");
 const userController=require("../controllers/user.js")
+
+router.get("/profile", isLoggedIn, wrapAsync(userController.renderProfile));
 
 
 
