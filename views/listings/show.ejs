@@ -3,8 +3,10 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
 <script>
      let mapToken="<%=process.env.MAP_TOKEN%>";
-     const listing=<%-JSON.stringify(listing)%>;
-     
+     const listing = {
+         title: <%- JSON.stringify(listing.title) %>,
+         geometry: <%- JSON.stringify(listing.geometry) %>
+     };
 </script>
 <body>
     <div class="row mt-3">

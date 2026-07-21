@@ -6,8 +6,6 @@ const map = new mapboxgl.Map({
     zoom: 9
 });
 
-console.log(listing.geometry.coordinates); 
-
 // Fixed marker code
 const marker = new mapboxgl.Marker({ color: "red" })
     .setLngLat(listing.geometry.coordinates)
