@@ -5,6 +5,10 @@ module.exports.renderSignUpForm=(req,res)=>{
 module.exports.signup=(async(req,res,next)=>{
     try{
         let{username,email,password}=req.body;
+        if (!email.endsWith('.com')) {
+            req.flash('error', 'Email must end with .com');
+            return res.redirect('/signup');
+        }
          let newUser=new User({email,username});
         let registeredUser=await User.register(newUser,password);
         req.login(registeredUser,(err)=>{
