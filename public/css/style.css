@@ -17,7 +17,7 @@ body{
     color:#cc222e;
     font-size: 2rem;
 }
-.nav-link {
+.navbar .nav-link {
     color: var(--bs-body-color) !important;
 }
 .f-info-links a{
@@ -58,12 +58,12 @@ body{
     border:none !important;
     margin-bottom: 2rem;
 }
-.card-img-top{
+.listing-card .card-img-top{
     border-radius: 1rem !important;
     width:100% !important;
     object-fit:cover !important;
 }
-.card-body{
+.listing-card .card-body{
     padding:0 !important;
 }
 .card-text{
