@@ -1,14 +1,128 @@
 <% layout("/layouts/boilerplate.ejs")%>
-<div class="row mt-3">
-    <div class="col-8 offset-2">
-        <h2 class="mb-4">Admin Dashboard</h2>
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Welcome Admin!</h5>
-                <p class="card-text">You are successfully logged into the admin panel.</p>
-                <hr>
-                <a href="/listings" class="btn btn-dark">View Listings</a>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-5 text-center">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fa-solid fa-users"></i> Total Users</h5>
+                    <h2 class="display-5 fw-bold"><%= totalUsers %></h2>
+                </div>
             </div>
         </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success"><i class="fa-solid fa-house"></i> Total Listings</h5>
+                    <h2 class="display-5 fw-bold"><%= totalListings %></h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning"><i class="fa-solid fa-star"></i> Total Reviews</h5>
+                    <h2 class="display-5 fw-bold"><%= totalReviews %></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Nav Tabs -->
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-tab-pane" type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">
+                <i class="fa-solid fa-users me-1"></i> Users Management
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="listings-tab" data-bs-toggle="tab" data-bs-target="#listings-tab-pane" type="button" role="tab" aria-controls="listings-tab-pane" aria-selected="false">
+                <i class="fa-solid fa-house me-1"></i> Recent Listings
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content border border-top-0 rounded-bottom p-4 bg-body" id="adminTabsContent">
+        
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users-tab-pane" role="tabpanel" aria-labelledby="users-tab" tabindex="0">
+            <h4 class="mb-3">Recent Users</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let user of recentUsers) { %>
+                            <tr>
+                                <td><b>@<%= user.username %></b></td>
+                                <td><%= user.email %></td>
+                                <td>
+                                    <!-- Prevent admin from deleting themselves -->
+                                    <% if (user.email.toLowerCase().trim() !== process.env.ADMIN_EMAIL.toLowerCase().trim()) { %>
+                                        <form method="POST" action="/admin/users/<%= user._id %>?_method=DELETE" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this user? ALL their listings and reviews will be permanently deleted as well.');">
+                                            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash me-1"></i> Delete User</button>
+                                        </form>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">Admin</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% } %>
+                        <% if (recentUsers.length === 0) { %>
+                            <tr><td colspan="3" class="text-center text-muted">No users found.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Listings Tab -->
+        <div class="tab-pane fade" id="listings-tab-pane" role="tabpanel" aria-labelledby="listings-tab" tabindex="0">
+            <h4 class="mb-3">Recent Listings</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Owner</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let listing of recentListings) { %>
+                            <tr>
+                                <td><a href="/listings/<%= listing._id %>" class="text-decoration-none fw-bold"><%= listing.title %></a></td>
+                                <td><%= listing.owner ? '@' + listing.owner.username : 'Unknown' %></td>
+                                <td>&#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : '0' %></td>
+                                <td><%= listing.location %>, <%= listing.country %></td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-primary" target="_blank"><i class="fa-solid fa-eye"></i></a>
+                                        <form method="POST" action="/admin/listings/<%= listing._id %>?_method=DELETE" style="margin: 0;" onsubmit="return confirm('Are you sure you want to completely delete this listing?');">
+                                            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } %>
+                        <% if (recentListings.length === 0) { %>
+                            <tr><td colspan="5" class="text-center text-muted">No listings found.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
