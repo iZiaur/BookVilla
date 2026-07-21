@@ -94,7 +94,11 @@ app.listen(8080,(req,res)=>{
 })
 // app.get('/')
 app.get("/",(async(req,res)=>{
-    const alllistings=await Listing.find({}).sort({ _id: -1 }).lean()
+    let filter = {};
+    if (req.query.category) {
+        filter.category = req.query.category;
+    }
+    const alllistings=await Listing.find(filter).sort({ _id: -1 }).lean()
     res.render("listings/index.ejs",{alllistings})
 }))
 

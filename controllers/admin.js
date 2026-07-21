@@ -109,6 +109,7 @@ module.exports.seedListings = async (req, res) => {
         ];
 
         const adjectives = ["Beautiful", "Stunning", "Peaceful", "Luxurious", "Breathtaking", "Charming", "Spectacular"];
+        const categories = ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Artic", "Domes", "Boats"];
 
         let generatedListings = [];
         const ownerId = req.user._id;
@@ -118,6 +119,7 @@ module.exports.seedListings = async (req, res) => {
             const randomImg = images[Math.floor(Math.random() * images.length)];
             const randomTitle = titles[Math.floor(Math.random() * titles.length)];
             const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
             const price = Math.floor(Math.random() * 15000) + 1500;
 
             generatedListings.push(new Listing({
@@ -125,6 +127,7 @@ module.exports.seedListings = async (req, res) => {
                 description: `Experience the best of ${randomLoc.loc} in this amazing property. Perfect for vacations, getaways, and making memories.`,
                 image: { url: randomImg, filename: `seed_img_${i}` },
                 price: price.toString(),
+                category: randomCat,
                 location: randomLoc.loc,
                 country: randomLoc.country,
                 owner: ownerId,

@@ -28,6 +28,20 @@
         
         </div>
 
+         <div class="mb-3">
+             <% const categories = ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Artic", "Domes", "Boats"]; %>
+            <label for="category" class="form-label">Category</label>
+            <select id="category" name="listing[category]" class="form-select" required>
+                <option value="" disabled>Select a category</option>
+                <% for(let cat of categories) { %>
+                    <option value="<%=cat%>" <%= listing.category === cat ? 'selected' : '' %>><%=cat%></option>
+                <% } %>
+            </select>
+            <div class="invalid-feedback">
+                Please select a category.
+            </div>
+        </div>
+
 
 
         

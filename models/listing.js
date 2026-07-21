@@ -10,7 +10,11 @@ const listingSchema=new mongoose.Schema({
     image:{
         url:String,
         filename:String,
-
+    },
+    category: {
+        type: String,
+        enum: ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Artic", "Domes", "Boats"],
+        required: true
     },
     price:String,
     location:String,
