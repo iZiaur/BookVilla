@@ -13,9 +13,46 @@ router.delete("/users/:id", isAdmin, wrapAsync(adminController.deleteUser));
 router.delete("/reviews/:id", isAdmin, wrapAsync(adminController.deleteReview));
 
 const Listing = require("../models/listing.js");
+const User = require("../models/user.js");
 
 // Seed Route
 router.post("/seed", isAdmin, wrapAsync(adminController.seedListings));
+
+// Temporary Ownership Transfer Route
+router.get("/transfer-ownership", isAdmin, wrapAsync(async (req, res) => {
+    // Helper function to find or create user
+    const findOrCreateUser = async (username, email) => {
+        let user = await User.findOne({ username });
+        if (!user) {
+            const newUser = new User({ email, username });
+            user = await User.register(newUser, "password123");
+        }
+        return user;
+    };
+
+    const sahil = await findOrCreateUser("Sahil Kulhar", "sahil@bookvilla.com");
+    const mishti = await findOrCreateUser("Mishti Khanna", "mishti@bookvilla.com");
+
+    // Get 30 listings currently owned by the admin
+    const adminListings = await Listing.find({ owner: req.user._id }).limit(30);
+    
+    if (adminListings.length < 30) {
+        req.flash("error", `You only have ${adminListings.length} properties. Try generating more first!`);
+        return res.redirect("/admin");
+    }
+
+    for (let i = 0; i < 30; i++) {
+        if (i < 15) {
+            adminListings[i].owner = sahil._id;
+        } else {
+            adminListings[i].owner = mishti._id;
+        }
+        await adminListings[i].save();
+    }
+
+    req.flash("success", `Transferred 15 properties to Sahil and 15 to Mishti!`);
+    res.redirect("/admin");
+}));
 
 // Temporary Migration Route
 router.get("/migrate-categories", isAdmin, wrapAsync(async (req, res) => {
