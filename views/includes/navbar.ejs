@@ -28,20 +28,23 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse bg-white navbar-collapse" id="navbarNavAltMarkup">
+    <div class="collapse bg-body navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <br>
        
         <a class="nav-link" href="/listings">Explore</a>
         
         </div>
-        <div class="navbar-nav bg-white ms-auto">
+        <div class="navbar-nav bg-body ms-auto">
           <form class="d-flex" role="search" action="/listings/search" >
             <input class="form-control me-2 search-input" type="search" placeholder="Search Destinations" name="search"/>
             <button class="btn btn-search" type="submit"><i class="fa-brands fa-searchengin"></i>&nbsp;Search</button>
           </form>
         </div>
-        <div class="navbar-nav ms-auto">
+        <div class="navbar-nav ms-auto align-items-center">
+          <button id="theme-toggle" class="btn btn-sm btn-outline-secondary me-2 rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;" aria-label="Toggle Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
           <a class="nav-link" href="/listings/new">BookVilla&nbsp; your&nbsp; home</a>
          <% if(!currUser){ %>
         <a class="nav-link "  href="/signup"><b>Sign Up</b></a>

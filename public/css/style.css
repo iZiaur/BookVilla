@@ -11,18 +11,18 @@ body{
 
 .navbar{
     height: 5rem;
-    background-color: white;
+    background-color: var(--bs-body-bg);
 }
 .fa-compass{
     color:#cc222e;
     font-size: 2rem;
 }
 .nav-link {
-    color:#222222 !important;
+    color: var(--bs-body-color) !important;
 }
 .f-info-links a{
     text-decoration: none;
-    color:#222222;
+    color: var(--bs-body-color);
 }
 
 .f-info-links a:hover{
@@ -48,7 +48,7 @@ body{
     text-align: center;
     display: flex;
     height:8rem;
-    background-color: #ebebeb;
+    background-color: var(--bs-tertiary-bg);
     flex-wrap:wrap;
     justify-content: center;
     align-items:space-evenly;
