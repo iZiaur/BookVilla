@@ -27,7 +27,7 @@ module.exports.isAdmin = (req, res, next) => {
         return res.redirect('/login');
     }
     
-    if (req.user.email !== process.env.ADMIN_EMAIL) {
+    if (!process.env.ADMIN_EMAIL || req.user.email.toLowerCase().trim() !== process.env.ADMIN_EMAIL.toLowerCase().trim()) {
         req.flash('error', 'You do not have permission to access the admin panel');
         return res.redirect('/listings');
     }

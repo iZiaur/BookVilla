@@ -33,7 +33,7 @@ module.exports.renderLoginForm=(req,res)=>{
 module.exports.login=async(req,res)=>{
     req.flash('success','You are logged in!');
     
-    if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
+    if (req.user && req.user.email && process.env.ADMIN_EMAIL && req.user.email.toLowerCase().trim() === process.env.ADMIN_EMAIL.toLowerCase().trim()) {
         return res.redirect('/admin');
     }
     
