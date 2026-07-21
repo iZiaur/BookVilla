@@ -12,4 +12,7 @@ router.delete("/listings/:id", isAdmin, wrapAsync(adminController.deleteListing)
 router.delete("/users/:id", isAdmin, wrapAsync(adminController.deleteUser));
 router.delete("/reviews/:id", isAdmin, wrapAsync(adminController.deleteReview));
 
+// Seed Route
+router.post("/seed", isAdmin, wrapAsync(adminController.seedListings));
+
 module.exports = router;
