@@ -1,13 +1,13 @@
 let User=require("../models/user.js");
 module.exports.renderSignUpForm=(req,res)=>{
-    res.render("users/signup.ejs");
+    res.redirect('/login?mode=signup');
 }
 module.exports.signup=(async(req,res,next)=>{
     try{
         let{username,email,password}=req.body;
         if (!email.endsWith('.com')) {
             req.flash('error', 'Email must end with .com');
-            return res.redirect('/signup');
+            return res.redirect('/login?mode=signup');
         }
          let newUser=new User({email,username});
         let registeredUser=await User.register(newUser,password);
@@ -23,12 +23,13 @@ module.exports.signup=(async(req,res,next)=>{
     }
     catch(err){
         req.flash('error',err.message);
-        res.redirect('/listings');
+        res.redirect('/login?mode=signup');
     }
    
 })
 module.exports.renderLoginForm=(req,res)=>{
-    res.render('users/login.ejs')
+    const mode = req.query.mode || 'login';
+    res.render('users/login.ejs', { mode });
 }
 module.exports.login=async(req,res)=>{
     req.flash('success','You are logged in!');
