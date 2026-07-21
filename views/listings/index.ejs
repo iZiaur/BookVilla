@@ -36,6 +36,7 @@
 
 </style>
 <body>
+    <h1 class="visually-hidden">BookVilla Listings</h1>
     <div id="filters" class="d-none d-md-flex" >
 
         <div class="filter">
@@ -111,7 +112,7 @@
     <% for(let listings of alllistings){ %>
     <a href="/listings/<%=listings._id%>" class="listing-link">
     <div class="card col listing-card">
-          <img src="<%=listings.image.url%>" class="card-img-top" alt="listing_image" style="height: 20rem;">
+          <img src="<%=listings.image.url.replace('/upload/', '/upload/f_auto,q_auto,w_800/')%>" class="card-img-top" alt="listing_image" style="height: 20rem;" loading="lazy" decoding="async">
           <div class="card-img-overlay"></div>
         <div class="card-body">
         <p class="card-text">
