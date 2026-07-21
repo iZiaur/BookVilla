@@ -85,16 +85,21 @@ module.exports.seedListings = async (req, res) => {
         ];
 
         const locations = [
-            { loc: "New York", country: "USA", coords: [-74.006, 40.7128] },
-            { loc: "London", country: "UK", coords: [-0.1276, 51.5074] },
-            { loc: "Paris", country: "France", coords: [2.3522, 48.8566] },
-            { loc: "Tokyo", country: "Japan", coords: [139.6917, 35.6895] },
-            { loc: "Sydney", country: "Australia", coords: [151.2093, -33.8688] },
-            { loc: "Rome", country: "Italy", coords: [12.4964, 41.9028] },
-            { loc: "Los Angeles", country: "USA", coords: [-118.2437, 34.0522] },
-            { loc: "Cape Town", country: "South Africa", coords: [18.4232, -33.9249] },
-            { loc: "Rio de Janeiro", country: "Brazil", coords: [-43.1729, -22.9068] },
-            { loc: "Bali", country: "Indonesia", coords: [115.1889, -8.4095] }
+            { loc: "Mumbai", country: "India", coords: [72.8777, 19.0760] },
+            { loc: "Delhi", country: "India", coords: [77.2090, 28.6139] },
+            { loc: "Bengaluru", country: "India", coords: [77.5946, 12.9716] },
+            { loc: "Hyderabad", country: "India", coords: [78.4867, 17.3850] },
+            { loc: "Ahmedabad", country: "India", coords: [72.5714, 23.0225] },
+            { loc: "Chennai", country: "India", coords: [80.2707, 13.0827] },
+            { loc: "Kolkata", country: "India", coords: [88.3639, 22.5726] },
+            { loc: "Pune", country: "India", coords: [73.8567, 18.5204] },
+            { loc: "Jaipur", country: "India", coords: [75.7873, 26.9124] },
+            { loc: "Goa", country: "India", coords: [74.1240, 15.2993] },
+            { loc: "Agra", country: "India", coords: [78.0081, 27.1767] },
+            { loc: "Varanasi", country: "India", coords: [82.9739, 25.3176] },
+            { loc: "Udaipur", country: "India", coords: [73.6828, 24.5854] },
+            { loc: "Kochi", country: "India", coords: [76.2673, 9.9312] },
+            { loc: "Shimla", country: "India", coords: [77.1734, 31.1048] }
         ];
 
         const titles = [
