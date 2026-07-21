@@ -1,5 +1,6 @@
-
 <% layout("/layouts/boilerplate.ejs")%>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
 <script>
      let mapToken="<%=process.env.MAP_TOKEN%>";
      const listing=<%-JSON.stringify(listing)%>;
