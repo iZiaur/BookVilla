@@ -33,12 +33,16 @@
 
                     <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
-                    <input
-                     type="password"
-                      id="password"
-                       name="password"
-                         class="form-control" required>
-                    
+                    <div class="input-group">
+                        <input
+                         type="password"
+                          id="password"
+                           name="password"
+                             class="form-control" required>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" aria-label="Show password">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                     </div>
                     
                     <button class="btn btn-success">Sign Up</button>
@@ -49,3 +53,23 @@
             </form>
             </div>
             </div>
+<script>
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                
+                setTimeout(() => {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }, 2000);
+            }
+        });
+    });
+</script>
