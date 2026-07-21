@@ -71,18 +71,19 @@ module.exports.deleteReview = async (req, res) => {
 
 module.exports.seedListings = async (req, res) => {
     try {
-        const images = [
-            "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1502672260266-1c1de24220e8?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80"
-        ];
+        const categoryImages = {
+            "Trending": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+            "Rooms": "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80",
+            "Iconic cities": "https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=1200&q=80",
+            "Mountains": "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&q=80",
+            "Castles": "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?auto=format&fit=crop&w=1200&q=80",
+            "Amazing pools": "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=80",
+            "Camping": "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80",
+            "Farms": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
+            "Artic": "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1200&q=80",
+            "Domes": "https://images.unsplash.com/photo-1587061949409-02df41d5e562?auto=format&fit=crop&w=1200&q=80",
+            "Boats": "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?auto=format&fit=crop&w=1200&q=80"
+        };
 
         const locations = [
             { loc: "Mumbai", country: "India", coords: [72.8777, 19.0760] },
@@ -109,23 +110,23 @@ module.exports.seedListings = async (req, res) => {
         ];
 
         const adjectives = ["Beautiful", "Stunning", "Peaceful", "Luxurious", "Breathtaking", "Charming", "Spectacular"];
-        const categories = ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Artic", "Domes", "Boats"];
+        const categories = Object.keys(categoryImages);
 
         let generatedListings = [];
         const ownerId = req.user._id;
 
         for (let i = 0; i < 100; i++) {
             const randomLoc = locations[Math.floor(Math.random() * locations.length)];
-            const randomImg = images[Math.floor(Math.random() * images.length)];
             const randomTitle = titles[Math.floor(Math.random() * titles.length)];
             const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
             const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            const matchedImg = categoryImages[randomCat];
             const price = Math.floor(Math.random() * 15000) + 1500;
 
             generatedListings.push(new Listing({
                 title: `${randomAdj} ${randomTitle}`,
                 description: `Experience the best of ${randomLoc.loc} in this amazing property. Perfect for vacations, getaways, and making memories.`,
-                image: { url: randomImg, filename: `seed_img_${i}` },
+                image: { url: matchedImg, filename: `seed_img_${i}` },
                 price: price.toString(),
                 category: randomCat,
                 location: randomLoc.loc,
