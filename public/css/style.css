@@ -14,7 +14,7 @@ body{
     background-color: white;
 }
 .fa-compass{
-    color:#fe424d;
+    color:#cc222e;
     font-size: 2rem;
 }
 .nav-link {
@@ -85,7 +85,7 @@ body{
 
 /* New Page */
 .add-btn{
-    background-color:#fe424d !important;
+    background-color:#cc222e !important;
     border:none !important;
 
 }
@@ -93,7 +93,7 @@ body{
 /* Edit Page  */
 
 .edit-btn{
-    background-color:#fe424d !important;
+    background-color:#cc222e !important;
     border:none !important;
 
 
