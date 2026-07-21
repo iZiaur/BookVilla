@@ -6,7 +6,7 @@ console.log(mapToken);
 const geocodingClient = mbxGeocoding({ accessToken: mapToken});
 
 module.exports.index=(async(req,res)=>{
-    const alllistings=await Listing.find({})
+    const alllistings=await Listing.find({}).lean();
     res.render("listings/index.ejs",{alllistings})
 })
 
@@ -20,14 +20,12 @@ module.exports.showListing=(async(req,res)=>{
     let {id}=req.params;
     let listing= await Listing.findById(id).populate({path:"reviews",
     populate:{path:"author"},
-    }).populate("owner");
-    console.log(listing);
+    }).populate("owner").lean();
     
     if(!listing){
         req.flash("error","Listing you request does not exist!");
         return res.redirect("/listings")
     }
-    console.log(listing);
     res.render("listings/show.ejs",{listing});
 })
 

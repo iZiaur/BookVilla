@@ -8,8 +8,8 @@ module.exports.renderDashboard = async (req, res) => {
         const totalUsers = await User.countDocuments();
         const totalReviews = await Review.countDocuments();
 
-        const recentListings = await Listing.find({}).populate('owner').sort({ _id: -1 }).limit(10);
-        const recentUsers = await User.find({}).sort({ _id: -1 }).limit(10);
+        const recentListings = await Listing.find({}).populate('owner').sort({ _id: -1 }).limit(10).lean();
+        const recentUsers = await User.find({}).sort({ _id: -1 }).limit(10).lean();
 
         res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentUsers });
     } catch (err) {

@@ -94,7 +94,7 @@ app.listen(8080,(req,res)=>{
 })
 // app.get('/')
 app.get("/",(async(req,res)=>{
-    const alllistings=await Listing.find({})
+    const alllistings=await Listing.find({}).lean()
     res.render("listings/index.ejs",{alllistings})
 }))
 
