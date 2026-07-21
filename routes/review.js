@@ -16,4 +16,10 @@ router.post("/",isLoggedIn,validateReview,wrapAsync(reviewController.createRevie
 
 router.delete("/:reviewId",isAuthor,wrapAsync(reviewController.deleteReview))
 
+// Review Edit Form Route
+router.get("/:reviewId/edit",isLoggedIn,isAuthor,wrapAsync(reviewController.renderEditForm))
+
+// Review Update Route
+router.put("/:reviewId",isLoggedIn,isAuthor,validateReview,wrapAsync(reviewController.updateReview))
+
 module.exports=router

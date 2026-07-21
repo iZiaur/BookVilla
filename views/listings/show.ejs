@@ -123,9 +123,12 @@
 
             </div>&nbsp;
             <% if(currUser && currUser._id.equals(review.author._id)) { %>
-                <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE" >
-                    <button class="btn btn-sm btn-dark">Delete</button>
-                </form>
+                <div class="d-flex mb-3 gap-2 align-items-center">
+                    <a href="/listings/<%=listing._id%>/reviews/<%=review._id%>/edit" class="btn btn-sm btn-outline-dark" aria-label="Edit Review" title="Edit Review"><i class="fa-solid fa-pencil"></i></a>
+                    <form method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE" style="margin:0;">
+                        <button class="btn btn-sm btn-dark">Delete</button>
+                    </form>
+                </div>
             <% } %>
 
            </div>
