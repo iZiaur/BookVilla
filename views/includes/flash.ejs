@@ -1,15 +1,72 @@
+<style>
+.custom-toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateY(100px);
+    opacity: 0;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.custom-toast.error {
+    border-left: 5px solid #FF385C;
+}
+.custom-toast.success {
+    border-left: 5px solid #28a745;
+}
+@keyframes slideUpFade {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+@keyframes fadeOut {
+    to {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+}
+</style>
+
 <% if(success && success.length > 0) { %>
-    <div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
-        <%= success%>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="custom-toast success" id="flash-message">
+        <div class="icon-circle bg-success-subtle text-success rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <div class="fw-semibold"><%= success %></div>
+        <button type="button" class="btn-close ms-3" aria-label="Close" onclick="closeToast()"></button>
     </div>
 <% } %>
-
-
 
 <% if(error && error.length > 0) { %>
-    <div class="alert alert-danger alert-dismissible fade show col-6 offset-3" role="alert">
-        <%= error%>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="custom-toast error" id="flash-message">
+        <div class="icon-circle bg-danger-subtle text-danger rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="fw-semibold"><%= error %></div>
+        <button type="button" class="btn-close ms-3" aria-label="Close" onclick="closeToast()"></button>
     </div>
 <% } %>
+
+<script>
+    function closeToast() {
+        const toast = document.getElementById('flash-message');
+        if (toast) {
+            toast.style.animation = 'fadeOut 0.3s forwards';
+            setTimeout(() => toast.remove(), 300);
+        }
+    }
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+        closeToast();
+    }, 4000);
+</script>
