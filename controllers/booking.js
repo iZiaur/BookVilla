@@ -22,6 +22,41 @@ const sendConfirmationEmail = async (booking, userEmail) => {
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             const finalPrice = booking.totalPrice - (booking.discountAmount || 0);
+            
+            // Generate Welcome Guide via AI
+            let aiWelcomeGuideHTML = '';
+            try {
+                const prompt = `
+                You are a warm, welcoming Airbnb superhost for the property "${booking.listing.title}" located in ${booking.listing.location}.
+                Write a highly personalized, enthusiastic welcome letter for a guest named ${booking.guestName}.
+                Include some quick packing tips and 2-3 local recommendations for things to do or eat in ${booking.listing.location}.
+                Use Markdown formatting and emojis. Keep it under 200 words.
+                `;
+
+                const response = await ai.models.generateContent({
+                    model: 'gemini-3.6-flash',
+                    contents: prompt,
+                });
+
+                let htmlResponse = response.text
+                    .replace(/### (.*)/g, '<h4 style="color: #0d6efd; margin-top: 15px; margin-bottom: 5px;">$1</h4>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/- (.*)/g, '<li style="margin-bottom: 5px;">$1</li>');
+                    
+                htmlResponse = htmlResponse.replace(/(<li.*<\/li>\n*)+/g, '<ul style="padding-left: 20px; color: #555;">$&</ul>');
+                
+                aiWelcomeGuideHTML = `
+                <div style="background-color: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #ced4da;">
+                    <h3 style="margin-top: 0; color: #212529;">✨ Your Personalized Welcome Guide</h3>
+                    <div style="font-size: 15px; line-height: 1.5; color: #333;">
+                        ${htmlResponse}
+                    </div>
+                </div>
+                `;
+            } catch (aiErr) {
+                console.error("Failed to generate AI Welcome Guide for email:", aiErr);
+            }
+
             await transporter.sendMail({
                 from: `"BookVilla" <${process.env.EMAIL_USER}>`,
                 to: userEmail,
@@ -44,6 +79,8 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                                 <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
                                 <p style="font-size: 18px; margin: 0;"><b>Total Paid:</b> ₹${finalPrice.toLocaleString("en-IN")}</p>
                             </div>
+                            
+                            ${aiWelcomeGuideHTML}
                             
                             <p style="font-size: 14px; color: #666;">You can view more details and contact your host from your <a href="https://book-villa.vercel.app/profile" style="color: #0d6efd;">BookVilla Profile</a>.</p>
                         </div>
