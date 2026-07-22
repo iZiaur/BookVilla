@@ -91,7 +91,8 @@ module.exports.validateBooking = (req, res, next) => {
     if (error) {
         let errMsg = error.details.map(el => el.message).join(",");
         req.flash('error', errMsg);
-        return res.redirect('back');
+        let redirectUrl = req.params.id ? `/listings/${req.params.id}` : '/listings';
+        return res.redirect(redirectUrl);
     } else {
         next();
     }

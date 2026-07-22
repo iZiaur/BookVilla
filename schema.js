@@ -26,7 +26,7 @@ module.exports.reviewSchema=Joi.object({
 
 module.exports.bookingSchema = Joi.object({
     booking: Joi.object({
-        checkIn: Joi.date().iso().min('now').required(),
+        checkIn: Joi.date().iso().required(),
         checkOut: Joi.date().iso().greater(Joi.ref('checkIn')).required(),
         guestName: Joi.string().required(),
         guestEmail: Joi.string().email().required(),
