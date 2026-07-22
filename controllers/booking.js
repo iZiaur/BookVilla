@@ -212,12 +212,124 @@ module.exports.verifyOTP = async (req, res) => {
         return res.redirect(`/listings/${id}/book/${bookingId}/verify`);
     }
 
-    // Success! Update booking status
-    booking.status = "Confirmed";
+    // Success! Update booking status to Awaiting Payment
+    booking.status = "Awaiting Payment";
     booking.otp = undefined; // clear OTP
     booking.otpExpires = undefined;
     await booking.save();
 
-    req.flash('success', `Booking Confirmed! Enjoy your stay at ${booking.listing.title}!`);
+    req.flash('success', 'OTP Verified! Please complete your payment to confirm the booking.');
+    res.redirect(`/listings/${id}/book/${bookingId}/pay`);
+};
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_mock');
+
+module.exports.renderPayment = async (req, res) => {
+    const { id, bookingId } = req.params;
+    const booking = await Booking.findById(bookingId).populate('listing');
+    
+    if (!booking) {
+        req.flash('error', 'Booking not found.');
+        return res.redirect(`/listings/${id}`);
+    }
+    
+    if (booking.status === "Confirmed") {
+        req.flash('error', 'Booking is already confirmed.');
+        return res.redirect('/profile');
+    }
+
+    if (booking.status !== "Awaiting Payment") {
+        req.flash('error', 'Invalid booking status for payment.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    res.render('bookings/pay.ejs', { booking, stripeConfigured: !!process.env.STRIPE_SECRET_KEY });
+};
+
+module.exports.applyCoupon = async (req, res) => {
+    const { bookingId } = req.params;
+    const { couponCode } = req.body;
+    
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+        return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Example logic: if coupon is "SAVE25", give 25% off.
+    if (couponCode === 'SAVE25') {
+        const discount = booking.totalPrice * 0.25;
+        booking.discountAmount = discount;
+        await booking.save();
+        return res.json({ success: true, discountAmount: discount, newTotal: booking.totalPrice - discount });
+    }
+
+    return res.status(400).json({ error: 'Invalid coupon code' });
+};
+
+module.exports.createCheckoutSession = async (req, res) => {
+    const { id, bookingId } = req.params;
+    const booking = await Booking.findById(bookingId).populate('listing');
+    
+    if (!booking || booking.status !== "Awaiting Payment") {
+        req.flash('error', 'Invalid booking for payment.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    const domain = `${req.protocol}://${req.get('host')}`;
+    const finalPrice = booking.totalPrice - (booking.discountAmount || 0);
+
+    // Mock payment fallback if Stripe is not configured
+    if (!process.env.STRIPE_SECRET_KEY) {
+        booking.status = "Confirmed";
+        await booking.save();
+        req.flash('success', `Mock Payment Successful! Enjoy your stay at ${booking.listing.title}!`);
+        return res.redirect('/profile');
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price_data: {
+                        currency: 'inr',
+                        product_data: {
+                            name: `Booking at ${booking.listing.title}`,
+                            description: `${booking.numberOfGuests} guests`,
+                        },
+                        unit_amount: finalPrice * 100, // Stripe expects amount in paise/cents
+                    },
+                    quantity: 1,
+                },
+            ],
+            mode: 'payment',
+            success_url: `${domain}/listings/${id}/book/${bookingId}/pay/success`,
+            cancel_url: `${domain}/listings/${id}/book/${bookingId}/pay/cancel`,
+        });
+
+        res.redirect(303, session.url);
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Error initializing payment gateway.');
+        res.redirect(`/listings/${id}/book/${bookingId}/pay`);
+    }
+};
+
+module.exports.paymentSuccess = async (req, res) => {
+    const { id, bookingId } = req.params;
+    const booking = await Booking.findById(bookingId).populate('listing');
+    
+    if (!booking) return res.redirect('/profile');
+
+    booking.status = "Confirmed";
+    await booking.save();
+
+    req.flash('success', `Payment Successful! Enjoy your stay at ${booking.listing.title}!`);
     res.redirect('/profile');
+};
+
+module.exports.paymentCancel = async (req, res) => {
+    const { id, bookingId } = req.params;
+    req.flash('error', 'Payment was cancelled. You can complete it later from your profile.');
+    res.redirect(`/listings/${id}/book/${bookingId}/pay`);
 };

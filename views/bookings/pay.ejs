@@ -1,0 +1,115 @@
+<% layout("/layouts/boilerplate.ejs")%>
+<div class="row mt-5 mb-5">
+    <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <div class="card shadow border-0 rounded-4 p-4 p-md-5">
+            <h3 class="fw-bold mb-4 text-center">Complete Your Booking</h3>
+            
+            <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
+                <img src="<%= booking.listing.image.url.replace('/upload/', '/upload/w_150,h_150,c_fill/') %>" class="rounded-3 me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="<%= booking.listing.title %>">
+                <div>
+                    <h5 class="fw-bold mb-1"><%= booking.listing.title %></h5>
+                    <p class="text-muted small mb-0"><i class="fa-solid fa-location-dot me-1"></i><%= booking.listing.location %></p>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-3">Booking Summary</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Dates</span>
+                    <span class="fw-semibold"><%= new Date(booking.checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> - <%= new Date(booking.checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Guests</span>
+                    <span class="fw-semibold"><%= booking.numberOfGuests %></span>
+                </div>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="mb-4 pb-4 border-bottom">
+                <h6 class="fw-bold text-uppercase text-muted small mb-3">Have a Coupon?</h6>
+                <div class="input-group">
+                    <input type="text" id="couponCode" class="form-control text-uppercase" placeholder="Enter code (e.g., SAVE25)">
+                    <button class="btn btn-outline-dark" id="applyCouponBtn" type="button">Apply</button>
+                </div>
+                <div id="couponMessage" class="small mt-2"></div>
+            </div>
+            
+            <div class="mb-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-3">Price Details</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Original Total</span>
+                    <span>&#8377; <%= booking.totalPrice.toLocaleString("en-IN") %></span>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2 text-success" id="discountRow" style="<%= booking.discountAmount > 0 ? '' : 'display: none;' %>">
+                    <span>Discount</span>
+                    <span id="discountValue">- &#8377; <%= (booking.discountAmount || 0).toLocaleString("en-IN") %></span>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                    <span class="fw-bold fs-5">Final Amount</span>
+                    <span class="fw-bold fs-5 text-primary" id="finalPrice">&#8377; <%= (booking.totalPrice - (booking.discountAmount || 0)).toLocaleString("en-IN") %></span>
+                </div>
+            </div>
+            
+            <form action="/listings/<%= booking.listing._id %>/book/<%= booking._id %>/pay/checkout" method="POST">
+                <div class="d-grid gap-3">
+                    <% if(stripeConfigured) { %>
+                        <button type="submit" class="btn btn-dark btn-lg rounded-pill fw-bold d-flex align-items-center justify-content-center">
+                            <i class="fa-brands fa-stripe fs-3 me-2" style="color: #635bff;"></i> Pay with Stripe
+                        </button>
+                    <% } else { %>
+                        <button type="submit" class="btn btn-success btn-lg rounded-pill fw-bold">
+                            <i class="fa-solid fa-credit-card me-2"></i> Complete Mock Payment
+                        </button>
+                        <p class="text-center text-muted small mt-2 mb-0"><i class="fa-solid fa-circle-info me-1"></i>Stripe keys are not configured. This button will simulate a successful payment.</p>
+                    <% } %>
+                    <a href="/profile" class="btn btn-outline-secondary rounded-pill">Pay Later</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('applyCouponBtn').addEventListener('click', async () => {
+        const codeInput = document.getElementById('couponCode');
+        const code = codeInput.value.trim().toUpperCase();
+        const msgDiv = document.getElementById('couponMessage');
+        const btn = document.getElementById('applyCouponBtn');
+        
+        if (!code) return;
+        
+        btn.disabled = true;
+        btn.innerText = '...';
+        
+        try {
+            const response = await fetch(`/listings/<%= booking.listing._id %>/book/<%= booking._id %>/pay/coupon`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ couponCode: code })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                msgDiv.innerHTML = '<span class="text-success"><i class="fa-solid fa-check-circle me-1"></i> Coupon applied successfully!</span>';
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountValue').innerText = '- ₹ ' + data.discountAmount.toLocaleString("en-IN");
+                document.getElementById('finalPrice').innerText = '₹ ' + data.newTotal.toLocaleString("en-IN");
+                codeInput.disabled = true;
+                btn.style.display = 'none';
+            } else {
+                msgDiv.innerHTML = `<span class="text-danger"><i class="fa-solid fa-circle-xmark me-1"></i> ${data.error || 'Invalid coupon'}</span>`;
+                btn.disabled = false;
+                btn.innerText = 'Apply';
+            }
+        } catch (err) {
+            msgDiv.innerHTML = '<span class="text-danger">An error occurred. Try again.</span>';
+            btn.disabled = false;
+            btn.innerText = 'Apply';
+        }
+    });
+</script>

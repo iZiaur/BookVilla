@@ -38,6 +38,11 @@ const bookingSchema = new Schema({
         required: true,
         min: 0
     },
+    discountAmount: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
     governmentId: {
         url: String,
         filename: String
@@ -49,7 +54,7 @@ const bookingSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["Pending", "Confirmed", "Cancelled"],
+        enum: ["Pending", "Awaiting Payment", "Confirmed", "Cancelled"],
         default: "Pending"
     },
     otp: {
