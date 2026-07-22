@@ -66,7 +66,12 @@
                                         <p class="mb-1 small"><i class="fa-solid fa-envelope me-2 text-secondary"></i><a href="mailto:<%= booking.listing.owner.email %>" class="text-decoration-none"><%= booking.listing.owner.email %></a></p>
                                         <p class="mb-1 small"><i class="fa-solid fa-phone me-2 text-secondary"></i><%= booking.listing.owner.phone || 'Not provided' %></p>
                                         <hr class="my-2">
-                                        <p class="mb-2 small"><i class="fa-solid fa-map-location-dot me-2 text-danger"></i><%= booking.listing.location %>, <%= booking.listing.country %></p>
+                                        <% if(booking.listing.address) { %>
+                                            <p class="mb-1 small"><i class="fa-solid fa-map-location-dot me-2 text-danger"></i><strong><%= booking.listing.address %></strong></p>
+                                            <p class="mb-2 small ms-4 text-muted"><%= booking.listing.location %>, <%= booking.listing.country %></p>
+                                        <% } else { %>
+                                            <p class="mb-2 small"><i class="fa-solid fa-map-location-dot me-2 text-danger"></i><%= booking.listing.location %>, <%= booking.listing.country %></p>
+                                        <% } %>
                                         
                                         <button class="btn btn-sm btn-outline-primary w-100 rounded-pill mt-2 welcome-guide-btn" data-booking-id="<%= booking._id %>" data-listing-id="<%= booking.listing._id %>">
                                             <i class="fa-solid fa-wand-magic-sparkles me-1"></i> View Welcome Guide

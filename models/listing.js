@@ -30,6 +30,7 @@ const listingSchema=new mongoose.Schema({
     },
     price:String,
     location:String,
+    address:String,
     country:String,
     reviews: [
         { type: Schema.Types.ObjectId, ref: 'Review' }

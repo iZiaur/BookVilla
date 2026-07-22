@@ -92,12 +92,18 @@
 
          <div class="mb-3">
 
-             <label for="location" class="form-label">Location</label>
+             <label for="location" class="form-label">Location (City/Area)</label>
             <input type="text" value="<%=listing.location%>" name="listing[location]" placeholder="enter location" class="form-control" required>
                  <div class="invalid-feedback">
                         Please provide a location.
                     </div>
 
+         </div>
+
+         <div class="mb-3">
+             <label for="address" class="form-label">Detailed Address (Optional)</label>
+            <textarea id="address" name="listing[address]" placeholder="enter exact address, e.g. 123 Main St, Apartment 4B" class="form-control" rows="2"><%=listing.address || ''%></textarea>
+            <div class="form-text text-muted">This will be shared with guests after their booking is confirmed.</div>
          </div>
 
          <div class="row">
