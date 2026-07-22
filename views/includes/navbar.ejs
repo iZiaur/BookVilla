@@ -29,20 +29,20 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse bg-body navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
+      <div class="navbar-nav me-auto" style="flex: 1;">
         <br>
        
         <a class="nav-link" href="/listings">Explore</a>
         
         </div>
-        <div class="navbar-nav bg-body mx-auto my-2 my-md-0" style="max-width: 500px; width: 100%;">
+        <div class="navbar-nav mx-auto my-2 my-md-0 justify-content-center" style="flex: 2; max-width: 500px; width: 100%;">
           <form action="/listings/search/vibe" method="POST" class="d-flex align-items-center bg-body-tertiary rounded-pill p-1 shadow-sm border w-100" style="transition: all 0.3s ease;" onsubmit="this.querySelector('button').innerHTML='<i class=\'fa-solid fa-spinner fa-spin\'></i>'">
             <i class="fa-solid fa-wand-magic-sparkles text-primary ms-3 me-2"></i>
             <input type="text" name="vibeQuery" class="form-control bg-transparent border-0 shadow-none" placeholder="Anywhere | Any week | Ask AI..." required>
             <button type="submit" class="btn btn-primary rounded-pill px-3 py-2 fw-bold text-nowrap" style="background: linear-gradient(45deg, #FF385C, #E61E4D); border: none;">Ask AI</button>
           </form>
         </div>
-        <div class="navbar-nav ms-auto align-items-center">
+        <div class="navbar-nav ms-auto align-items-center justify-content-md-end" style="flex: 1;">
           <button id="theme-toggle" class="btn btn-sm btn-outline-secondary me-2 rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;" aria-label="Toggle Theme">
             <i class="fa-solid fa-moon"></i>
           </button>
