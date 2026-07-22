@@ -24,6 +24,10 @@ const listingSchema=new mongoose.Schema({
         type: String,
         default: "Flexible - Full refund up to 24 hours before check-in."
     },
+    maxGuests: {
+        type: Number,
+        default: 6
+    },
     price:String,
     location:String,
     country:String,

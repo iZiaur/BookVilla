@@ -35,12 +35,32 @@
                     <span class="fs-4 fw-bold">&#8377; <%= totalPrice.toLocaleString("en-IN") %></span>
                 </div>
 
-                <h5 class="fw-bold mb-3">Identity & Verification</h5>
+                <h5 class="fw-bold mb-3">Guest Information</h5>
                 
                 <form action="/listings/<%= listing._id %>/book" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                     <!-- Hidden inputs to pass the dates to the POST route -->
                     <input type="hidden" name="booking[checkIn]" value="<%= checkIn %>">
                     <input type="hidden" name="booking[checkOut]" value="<%= checkOut %>">
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="guestName" class="form-label fw-bold">Full Name</label>
+                            <input type="text" class="form-control" id="guestName" name="booking[guestName]" value="<%= currUser.username %>" required>
+                            <div class="invalid-feedback">Please provide your full name.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="guestEmail" class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control" id="guestEmail" name="booking[guestEmail]" value="<%= currUser.email %>" required>
+                            <div class="invalid-feedback">Please provide a valid email.</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="numberOfGuests" class="form-label fw-bold">Number of Guests <span class="text-muted fw-normal">(Max <%= listing.maxGuests %>)</span></label>
+                            <input type="number" class="form-control" id="numberOfGuests" name="booking[numberOfGuests]" value="1" min="1" max="<%= listing.maxGuests %>" required>
+                            <div class="invalid-feedback">Please enter a valid number of guests (max <%= listing.maxGuests %>).</div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-3 border-top pt-4">Identity & Verification</h5>
 
                     <div class="mb-4">
                         <label for="governmentId" class="form-label fw-bold">Upload Government ID</label>

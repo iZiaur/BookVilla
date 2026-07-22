@@ -90,12 +90,9 @@
         <hr>
         <div class="row">
             <div class="col-md-6 mb-3 mb-md-0">
-                <h5 class="fw-bold"><i class="fa-solid fa-house-circle-exclamation me-2"></i>House Rules</h5>
-                <p class="text-muted" style="white-space: pre-line;"><%= listing.houseRules || 'No specific rules provided.' %></p>
-            </div>
-            <div class="col-md-6">
-                <h5 class="fw-bold"><i class="fa-solid fa-clock-rotate-left me-2"></i>Cancellation Policy</h5>
-                <p class="text-muted" style="white-space: pre-line;"><%= listing.cancellationPolicy || 'Flexible - Full refund up to 24 hours before check-in.' %></p>
+                <p class="mb-2"><i class="fa-solid fa-person text-secondary me-2"></i><b>Max Guests:</b> <%= listing.maxGuests || 6 %></p>
+                <p class="mb-2"><i class="fa-solid fa-list-check text-secondary me-2"></i><b>House Rules:</b> <%= listing.houseRules || 'No specific rules provided.' %></p>
+                <p class="mb-0"><i class="fa-solid fa-ban text-secondary me-2"></i><b>Cancellation:</b> <%= listing.cancellationPolicy || 'Flexible - Full refund up to 24 hours before check-in.' %></p>
             </div>
         </div>
     </div>

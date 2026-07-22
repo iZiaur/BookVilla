@@ -50,8 +50,8 @@ module.exports.renderCheckout = async (req, res) => {
 
 module.exports.initiateBooking = async (req, res) => {
     const { id } = req.params;
-    const { checkIn, checkOut } = req.body.booking;
-    
+    const { checkIn, checkOut, guestName, guestEmail, numberOfGuests } = req.body.booking;
+
     const listing = await Listing.findById(id);
     if (!listing) {
         req.flash('error', 'Listing not found!');
@@ -79,6 +79,13 @@ module.exports.initiateBooking = async (req, res) => {
     // Verify consent
     if (req.body.booking.consentGiven !== 'on') {
         req.flash('error', 'You must provide consent to book.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    // Verify guest count
+    const guests = parseInt(numberOfGuests, 10);
+    if (guests > listing.maxGuests) {
+        req.flash('error', `This property allows a maximum of ${listing.maxGuests} guests.`);
         return res.redirect(`/listings/${id}`);
     }
 
@@ -111,6 +118,9 @@ module.exports.initiateBooking = async (req, res) => {
         listing: id,
         checkIn: checkInDate,
         checkOut: checkOutDate,
+        guestName: guestName,
+        guestEmail: guestEmail,
+        numberOfGuests: guests,
         totalPrice: totalPrice,
         status: "Pending",
         otp: otp,

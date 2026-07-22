@@ -20,6 +20,19 @@ const bookingSchema = new Schema({
         type: Date,
         required: true
     },
+    guestName: {
+        type: String,
+        required: true
+    },
+    guestEmail: {
+        type: String,
+        required: true
+    },
+    numberOfGuests: {
+        type: Number,
+        required: true,
+        min: 1
+    },
     totalPrice: {
         type: Number,
         required: true,
