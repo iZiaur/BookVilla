@@ -45,7 +45,21 @@ module.exports.showListing=(async(req,res)=>{
         };
     });
 
-    res.render("listings/show.ejs",{listing, bookedDates});
+    // Calculate host average rating
+    const ownerListings = await Listing.find({ owner: listing.owner._id }).populate('reviews');
+    let totalRating = 0;
+    let totalReviews = 0;
+    for (let l of ownerListings) {
+        if (l.reviews) {
+            for (let r of l.reviews) {
+                totalRating += r.rating;
+                totalReviews++;
+            }
+        }
+    }
+    const hostAverageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : 'New';
+
+    res.render("listings/show.ejs",{listing, bookedDates, hostAverageRating, totalHostReviews: totalReviews});
 })
 
 module.exports.createListing=(async(req,res,next)=>{

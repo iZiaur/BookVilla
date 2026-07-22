@@ -7,12 +7,12 @@ module.exports.renderSignUpForm=(req,res)=>{
 }
 module.exports.signup=(async(req,res,next)=>{
     try{
-        let{username,email,password}=req.body;
+        let{username,email,password,phone}=req.body;
         if (!email.endsWith('.com')) {
             req.flash('error', 'Email must end with .com');
             return res.redirect('/login?mode=signup');
         }
-         let newUser=new User({email,username});
+        let newUser=new User({email,username,phone: phone || 'Not provided'});
         let registeredUser=await User.register(newUser,password);
         req.login(registeredUser,(err)=>{
             if(err){
@@ -61,8 +61,13 @@ module.exports.renderProfile = async (req, res) => {
         populate: { path: 'author' }
     });
 
-    // Fetch user's bookings
-    const bookings = await Booking.find({ user: req.user._id }).populate('listing').sort({ createdAt: -1 });
+    // Fetch user's bookings and populate listing with its owner
+    const bookings = await Booking.find({ user: req.user._id })
+        .populate({
+            path: 'listing',
+            populate: { path: 'owner' }
+        })
+        .sort({ createdAt: -1 });
     
     res.render('users/profile.ejs', { listings, bookings });
 };

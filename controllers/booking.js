@@ -90,7 +90,7 @@ module.exports.initiateBooking = async (req, res) => {
 
     // Generate OTP
     const otp = generateOTP();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
     // Verify consent
     if (req.body.booking.consentGiven !== 'on') {
@@ -157,7 +157,7 @@ module.exports.initiateBooking = async (req, res) => {
                 from: `"BookVilla" <${process.env.EMAIL_USER}>`,
                 to: req.user.email,
                 subject: "BookVilla - Your Booking OTP",
-                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 10 minutes.</p>`
+                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 5 minutes.</p>`
             });
         }
     } catch (err) {

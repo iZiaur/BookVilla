@@ -6,7 +6,10 @@ const userSchema=new Schema({
     email:{
         type:String,
         required:true
-
+    },
+    phone: {
+        type: String,
+        default: 'Not provided'
     }
 })
 userSchema.plugin(passportLocalMongooose);

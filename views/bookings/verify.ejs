@@ -20,15 +20,43 @@
                 </div>
                 
                 <div class="d-grid gap-2 px-md-5">
-                    <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">Confirm Booking</button>
+                    <button type="submit" id="verifyBtn" class="btn btn-primary btn-lg rounded-pill fw-bold">Confirm Booking</button>
                     <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-secondary rounded-pill mt-2">Cancel</a>
                 </div>
             </form>
             
             <div class="mt-4 pt-4 border-top">
-                <p class="small text-muted mb-0">Total amount to be paid: <span class="fw-bold text-dark">&#8377; <%= booking.totalPrice.toLocaleString("en-IN") %></span></p>
-                <p class="small text-muted">This booking code will expire in 10 minutes.</p>
+                <p class="small text-muted mb-2">Total amount to be paid: <span class="fw-bold text-dark">&#8377; <%= booking.totalPrice.toLocaleString("en-IN") %></span></p>
+                <div class="badge bg-danger rounded-pill px-3 py-2 fs-6">
+                    <i class="fa-regular fa-clock me-2"></i><span id="countdown">05:00</span>
+                </div>
+                <p id="expiredMsg" class="text-danger fw-bold mt-2 d-none">OTP Expired. Please cancel and book again.</p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let timeLeft = 300; // 5 minutes in seconds
+        const countdownEl = document.getElementById('countdown');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const expiredMsg = document.getElementById('expiredMsg');
+        
+        const timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                countdownEl.innerText = "00:00";
+                verifyBtn.disabled = true;
+                verifyBtn.innerText = "Expired";
+                expiredMsg.classList.remove('d-none');
+                return;
+            }
+            
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            countdownEl.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+            timeLeft--;
+        }, 1000);
+    });
+</script>
