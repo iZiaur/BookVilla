@@ -55,6 +55,11 @@
                 <i class="fa-solid fa-user-circle fs-5"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="navbarDropdown">
+                <li class="px-3 py-2 border-bottom mb-1">
+                  <span class="d-block fw-bold text-dark"><%= currUser.username %></span>
+                  <small class="text-muted"><%= currUser.email %></small>
+                </li>
+                <li><a class="dropdown-item fw-semibold" href="/profile"><i class="fa-solid fa-suitcase-rolling me-2 text-info"></i>Booking History</a></li>
                 <li><a class="dropdown-item fw-semibold" href="/profile"><i class="fa-solid fa-id-badge me-2 text-primary"></i>Your Profile</a></li>
                 <% if(currUser.username === 'admin' || (process.env.ADMIN_EMAIL && currUser.email === process.env.ADMIN_EMAIL)) { %>
                   <li><a class="dropdown-item fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-2 text-warning"></i>Admin Panel</a></li>
