@@ -110,13 +110,14 @@
     <div class="container mt-4 mb-3">
       <div class="row justify-content-center">
         <div class="col-md-8">
-          <form action="/listings/search/vibe" method="POST" class="d-flex align-items-center bg-white rounded-pill p-2 shadow-sm border" style="transition: all 0.3s ease;" onsubmit="this.querySelector('button').innerHTML='<i class=\'fa-solid fa-spinner fa-spin\'></i>...'">
+          <form action="/listings/search/vibe" method="POST" class="d-flex align-items-center bg-body rounded-pill p-2 shadow-sm border" style="transition: all 0.3s ease;" onsubmit="this.querySelector('button').innerHTML='<i class=\'fa-solid fa-spinner fa-spin\'></i>...'">
             <i class="fa-solid fa-wand-magic-sparkles text-primary ms-3 me-2 fs-5"></i>
-            <input type="text" name="vibeQuery" class="form-control border-0 shadow-none fs-5" placeholder="Where to? Try: 'A quiet cabin in the snow'" required>
+            <input type="text" name="vibeQuery" class="form-control bg-transparent border-0 shadow-none fs-5" placeholder="Where to? Try: 'A quiet cabin in the snow'" required>
             <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold text-nowrap" style="background: linear-gradient(45deg, #FF385C, #E61E4D); border: none;">Ask AI</button>
           </form>
         </div>
       </div>
+    </div>
     </div>
 
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
