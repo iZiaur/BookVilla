@@ -1,0 +1,69 @@
+<% layout("/layouts/boilerplate.ejs")%>
+<div class="row mt-5 mb-5">
+    <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-bottom pt-4 pb-3 px-4 rounded-top-4">
+                <h3 class="fw-bold mb-0">Confirm Your Booking Details</h3>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="d-flex mb-4">
+                    <img src="<%= listing.image.url.replace('/upload/', '/upload/w_200,h_150,c_fill/') %>" class="rounded-3 me-3" style="width: 120px; height: 90px; object-fit: cover;" alt="<%= listing.title %>">
+                    <div>
+                        <h5 class="fw-bold mb-1"><%= listing.title %></h5>
+                        <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %></p>
+                        <p class="mb-0 fw-bold">&#8377; <%= listing.price.toLocaleString("en-IN") %> <span class="text-muted fw-normal small">/ night</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="small text-muted mb-0 text-uppercase fw-bold">Check-in</p>
+                        <p class="mb-0 fw-semibold"><%= new Date(checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                    </div>
+                    <div class="text-center text-muted">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                    <div class="text-end">
+                        <p class="small text-muted mb-0 text-uppercase fw-bold">Check-out</p>
+                        <p class="mb-0 fw-semibold"><%= new Date(checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <span class="fs-5 text-muted">Total Payment</span>
+                    <span class="fs-4 fw-bold">&#8377; <%= totalPrice.toLocaleString("en-IN") %></span>
+                </div>
+
+                <h5 class="fw-bold mb-3">Identity & Verification</h5>
+                
+                <form action="/listings/<%= listing._id %>/book" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <!-- Hidden inputs to pass the dates to the POST route -->
+                    <input type="hidden" name="booking[checkIn]" value="<%= checkIn %>">
+                    <input type="hidden" name="booking[checkOut]" value="<%= checkOut %>">
+
+                    <div class="mb-4">
+                        <label for="governmentId" class="form-label fw-bold">Upload Government ID</label>
+                        <p class="small text-muted mb-2">We require a valid ID (Passport, Driver's License, or National ID) for security purposes.</p>
+                        <input class="form-control" type="file" id="governmentId" name="governmentId" accept="image/*" required>
+                        <div class="invalid-feedback">
+                            Please upload a valid Government ID image.
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="consentGiven" name="booking[consentGiven]" required>
+                        <label class="form-check-label text-muted small" for="consentGiven">
+                            I consent to the collection and processing of my ID for verification purposes, and I agree to the <a href="#" class="text-primary">Terms and Conditions</a> and <a href="#" class="text-primary">Privacy Policy</a> of BookVilla.
+                        </label>
+                        <div class="invalid-feedback">
+                            You must agree before continuing.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold fs-5">Confirm & Send OTP</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

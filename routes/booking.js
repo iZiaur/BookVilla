@@ -3,9 +3,15 @@ const router = express.Router({ mergeParams: true });
 const wrapAsync = require("../utils/wrapAsync");
 const { isLoggedIn, validateBooking } = require("../middleware.js");
 const bookingController = require("../controllers/booking.js");
+const multer = require('multer');
+const { storage } = require("../cloudConfig.js");
+const upload = multer({ storage });
+
+// GET /listings/:id/book/checkout
+router.get("/checkout", isLoggedIn, wrapAsync(bookingController.renderCheckout));
 
 // POST /listings/:id/book
-router.post("/", isLoggedIn, validateBooking, wrapAsync(bookingController.initiateBooking));
+router.post("/", isLoggedIn, upload.single("governmentId"), validateBooking, wrapAsync(bookingController.initiateBooking));
 
 // GET /listings/:id/book/:bookingId/verify
 router.get("/:bookingId/verify", isLoggedIn, wrapAsync(bookingController.renderVerify));

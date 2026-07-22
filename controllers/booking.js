@@ -17,6 +17,37 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+module.exports.renderCheckout = async (req, res) => {
+    const { id } = req.params;
+    const { "booking[checkIn]": checkIn, "booking[checkOut]": checkOut } = req.query;
+
+    if (!checkIn || !checkOut) {
+        req.flash('error', 'Please select check-in and check-out dates.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    const listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash('error', 'Listing not found!');
+        return res.redirect('/listings');
+    }
+
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    
+    if (checkOutDate <= checkInDate) {
+        req.flash('error', 'Check-out date must be after check-in date.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+    const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    const pricePerNight = parseFloat(listing.price) || 0;
+    const totalPrice = nights * pricePerNight;
+
+    res.render('bookings/checkout.ejs', { listing, checkIn, checkOut, totalPrice });
+};
+
 module.exports.initiateBooking = async (req, res) => {
     const { id } = req.params;
     const { checkIn, checkOut } = req.body.booking;
@@ -45,6 +76,21 @@ module.exports.initiateBooking = async (req, res) => {
     const otp = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
+    // Verify consent
+    if (req.body.booking.consentGiven !== 'on') {
+        req.flash('error', 'You must provide consent to book.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    // Verify file upload
+    if (!req.file) {
+        req.flash('error', 'Government ID is required.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    const url = req.file.path;
+    const filename = req.file.filename;
+
     // Create pending booking
     const booking = new Booking({
         user: req.user._id,
@@ -54,7 +100,9 @@ module.exports.initiateBooking = async (req, res) => {
         totalPrice: totalPrice,
         status: "Pending",
         otp: otp,
-        otpExpires: otpExpires
+        otpExpires: otpExpires,
+        governmentId: { url, filename },
+        consentGiven: true
     });
 
     await booking.save();

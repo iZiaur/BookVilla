@@ -25,6 +25,15 @@ const bookingSchema = new Schema({
         required: true,
         min: 0
     },
+    governmentId: {
+        url: String,
+        filename: String
+    },
+    consentGiven: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     status: {
         type: String,
         enum: ["Pending", "Confirmed", "Cancelled"],

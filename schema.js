@@ -28,5 +28,6 @@ module.exports.bookingSchema = Joi.object({
     booking: Joi.object({
         checkIn: Joi.date().iso().min('now').required(),
         checkOut: Joi.date().iso().greater(Joi.ref('checkIn')).required(),
+        consentGiven: Joi.string().valid('on').required()
     }).required()
 });

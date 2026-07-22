@@ -42,7 +42,7 @@
         <div class="card shadow-sm border-0 rounded-4 p-4">
             <h4 class="fw-bold mb-4">Book this property</h4>
             <% if (currUser) { %>
-                <form action="/listings/<%= listing._id %>/book" method="POST" id="bookingForm">
+                <form action="/listings/<%= listing._id %>/book/checkout" method="GET" id="bookingForm">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Check-in</label>
@@ -57,7 +57,7 @@
                         <div>
                             <span class="fs-5 fw-bold">&#8377; <%= listing.price.toLocaleString("en-IN") %></span> <span class="text-muted">/ night</span>
                         </div>
-                        <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-bold">Reserve</button>
+                        <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-bold">Continue to Booking</button>
                     </div>
                 </form>
                 <script>
