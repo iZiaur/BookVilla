@@ -54,7 +54,24 @@ module.exports.logout=(req,res,next)=>{
         req.flash('success','you are logged out!')
         res.redirect('/listings');
      })
-}
+};
+
+module.exports.editEmail = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email || !email.includes('@')) {
+            req.flash('error', 'Please provide a valid email address.');
+            return res.redirect('/profile');
+        }
+        
+        await User.findByIdAndUpdate(req.user._id, { email: email });
+        req.flash('success', 'Email updated successfully!');
+        res.redirect('/profile');
+    } catch (e) {
+        req.flash('error', 'Failed to update email.');
+        res.redirect('/profile');
+    }
+};
 
 module.exports.renderProfile = async (req, res) => {
     // Fetch user's listings and populate reviews

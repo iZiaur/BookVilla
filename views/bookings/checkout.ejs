@@ -45,13 +45,11 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label for="guestName" class="form-label fw-bold">Full Name</label>
-                            <input type="text" class="form-control" id="guestName" name="booking[guestName]" value="<%= currUser.username %>" required>
-                            <div class="invalid-feedback">Please provide your full name.</div>
+                            <input type="text" class="form-control bg-light" id="guestName" name="booking[guestName]" value="<%= currUser.username %>" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="guestEmail" class="form-label fw-bold">Email Address</label>
-                            <input type="email" class="form-control" id="guestEmail" name="booking[guestEmail]" value="<%= currUser.email %>" required>
-                            <div class="invalid-feedback">Please provide a valid email.</div>
+                            <input type="email" class="form-control bg-light" id="guestEmail" name="booking[guestEmail]" value="<%= currUser.email %>" readonly>
                         </div>
                         <div class="col-12">
                             <label for="numberOfGuests" class="form-label fw-bold">Number of Guests <span class="text-muted fw-normal">(Max <%= listing.maxGuests %>)</span></label>
