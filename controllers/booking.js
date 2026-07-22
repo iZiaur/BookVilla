@@ -88,6 +88,20 @@ module.exports.initiateBooking = async (req, res) => {
         return res.redirect(`/listings/${id}`);
     }
 
+    // Check for overlapping bookings
+    const overlappingBooking = await Booking.findOne({
+        listing: id,
+        status: { $in: ["Pending", "Confirmed"] },
+        $or: [
+            { checkIn: { $lt: checkOutDate }, checkOut: { $gt: checkInDate } }
+        ]
+    });
+
+    if (overlappingBooking) {
+        req.flash('error', 'These dates are already booked. Please choose different dates.');
+        return res.redirect(`/listings/${id}`);
+    }
+
     const url = req.file.path;
     const filename = req.file.filename;
 

@@ -1,4 +1,5 @@
 const Listing=require("../models/listing.js");
+const Booking = require("../models/booking.js");
 require('dotenv').config()
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken=process.env.MAP_TOKEN;
@@ -30,7 +31,22 @@ module.exports.showListing=(async(req,res)=>{
         req.flash("error","Listing you request does not exist!");
         return res.redirect("/listings")
     }
-    res.render("listings/show.ejs",{listing});
+
+    // Fetch all active bookings for this listing to disable dates on the calendar
+    let activeBookings = await Booking.find({ 
+        listing: id, 
+        status: { $in: ["Pending", "Confirmed"] } 
+    }).select("checkIn checkOut");
+
+    // Format dates for Flatpickr
+    let bookedDates = activeBookings.map(b => {
+        return {
+            from: b.checkIn.toISOString().split('T')[0],
+            to: b.checkOut.toISOString().split('T')[0]
+        };
+    });
+
+    res.render("listings/show.ejs",{listing, bookedDates});
 })
 
 module.exports.createListing=(async(req,res,next)=>{

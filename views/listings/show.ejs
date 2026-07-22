@@ -61,15 +61,19 @@
                     </div>
                 </form>
                 <script>
+                    const bookedDates = <%- JSON.stringify(bookedDates || []) %>;
+                    
                     document.addEventListener("DOMContentLoaded", function() {
                         const checkInPicker = flatpickr("#checkIn", {
                             minDate: "today",
+                            disable: bookedDates,
                             onChange: function(selectedDates, dateStr, instance) {
                                 checkOutPicker.set('minDate', new Date(selectedDates[0].getTime() + 24 * 60 * 60 * 1000));
                             }
                         });
                         const checkOutPicker = flatpickr("#checkOut", {
-                            minDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+                            minDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+                            disable: bookedDates
                         });
                     });
                 </script>
