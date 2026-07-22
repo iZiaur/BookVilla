@@ -21,8 +21,17 @@ router.route("/").get(wrapAsync(listingController.index)).post(isLoggedIn,upload
 // AI Search Route
 router.post("/search/vibe", wrapAsync(listingController.aiVibeSearch));
 
+// AI Price Estimator Route
+router.post("/ai-estimate-price", isLoggedIn, wrapAsync(listingController.aiEstimatePrice));
+
+// AI Image Analysis Route
+router.post("/ai-analyze-image", isLoggedIn, wrapAsync(listingController.aiAnalyzeImage));
+
 // AI Summary Route
 router.get("/:id/ai-summary", wrapAsync(listingController.generateAISummary));
+
+// AI Trip Itinerary Route
+router.get("/:id/ai-itinerary", wrapAsync(listingController.generateAIItinerary));
 
 // Rest of your routes...
 router.get("/new", isLoggedIn, listingController.renderNewForm);

@@ -47,7 +47,10 @@
             
                 <div class="mb-3">
                     <label for="image" class="form-label">Image Upload</label>
-                    <input type="file" id="image" name="listing[image]" placeholder="Choose file" class="form-control" required>
+                    <div class="input-group">
+                        <input type="file" id="image" name="listing[image]" placeholder="Choose file" class="form-control" required>
+                        <button type="button" class="btn btn-outline-primary d-none" id="aiImageBtn"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Auto-write Description</button>
+                    </div>
                     <div class="invalid-feedback">
                         Please provide a valid image URL.
                     </div>
@@ -56,7 +59,11 @@
                 <div class="row">
                     <div class="mb-3 col-md-4">
                         <label for="price" class="form-label">Price</label>
-                        <input type="number" id="price" name="listing[price]" placeholder="enter price" class="form-control" min="1" step="0.01" required>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" id="price" name="listing[price]" placeholder="enter price" class="form-control" min="1" step="0.01" required>
+                            <button type="button" class="btn btn-outline-success" id="aiPriceBtn" title="Suggest Price"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                        </div>
                         <div class="invalid-feedback">
                             Please provide a valid price.
                         </div>
@@ -97,4 +104,104 @@
             </form>
         </div>
     </div>
+
+<script>
+    // --- AI Price Estimator ---
+    document.getElementById('aiPriceBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('aiPriceBtn');
+        const location = document.getElementById('location').value;
+        const category = document.getElementById('category').value;
+        const description = document.getElementById('description').value;
+
+        if (!location) return alert("Please enter a location first to get a price estimate!");
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/listings/ai-estimate-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ location, category, description })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                document.getElementById('price').value = data.price;
+            } else {
+                alert(data.error || "Failed to estimate price.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error contacting AI service.");
+        } finally {
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
+            btn.disabled = false;
+        }
+    });
+
+    // --- AI Image Auto-Tagger ---
+    const imageInput = document.getElementById('image');
+    const aiImageBtn = document.getElementById('aiImageBtn');
+    
+    // Show button only when image is selected
+    imageInput.addEventListener('change', () => {
+        if (imageInput.files && imageInput.files[0]) {
+            aiImageBtn.classList.remove('d-none');
+        } else {
+            aiImageBtn.classList.add('d-none');
+        }
+    });
+
+    aiImageBtn.addEventListener('click', async () => {
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        aiImageBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Analyzing...';
+        aiImageBtn.disabled = true;
+
+        // Compress and convert to base64
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = async function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 600;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Get base64 string without data url prefix
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                const base64Data = dataUrl.split(',')[1];
+
+                try {
+                    const res = await fetch('/listings/ai-analyze-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ imageBase64: base64Data })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        const descField = document.getElementById('description');
+                        descField.value = data.description + (descField.value ? "\n\n" + descField.value : "");
+                    } else {
+                        alert(data.error || "Failed to analyze image.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Error contacting AI service.");
+                } finally {
+                    aiImageBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles me-2"></i>Auto-write Description';
+                    aiImageBtn.disabled = false;
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
 </body>

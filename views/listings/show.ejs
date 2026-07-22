@@ -107,8 +107,49 @@
                 <p class="mb-2"><i class="fa-solid fa-list-check text-secondary me-2"></i><b>House Rules:</b> <%= listing.houseRules || 'No specific rules provided.' %></p>
                 <p class="mb-0"><i class="fa-solid fa-ban text-secondary me-2"></i><b>Cancellation:</b> <%= listing.cancellationPolicy || 'Flexible - Full refund up to 24 hours before check-in.' %></p>
             </div>
+            <div class="col-md-6 d-flex flex-column align-items-start justify-content-center">
+                <p class="mb-2 text-muted small"><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>Not sure what to do in <%= listing.location %>?</p>
+                <button id="aiItineraryBtn" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+                    <i class="fa-regular fa-map me-2"></i>Plan My Trip
+                </button>
+            </div>
+        </div>
+
+        <div id="aiItineraryContainer" class="mt-4 p-4 bg-body-tertiary rounded-4 shadow-sm border d-none">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-plane-departure text-primary me-2"></i>Your AI Itinerary</h4>
+            <div id="aiItineraryContent"></div>
         </div>
     </div>
+    
+    <script>
+        document.getElementById('aiItineraryBtn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('aiItineraryBtn');
+            const container = document.getElementById('aiItineraryContainer');
+            const content = document.getElementById('aiItineraryContent');
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Planning...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/listings/<%=listing._id%>/ai-itinerary');
+                const data = await response.json();
+
+                if (data.success) {
+                    content.innerHTML = data.itinerary;
+                    container.classList.remove('d-none');
+                    btn.style.display = 'none'; // Hide button after generating
+                } else {
+                    alert(data.error || 'Failed to generate itinerary.');
+                    btn.innerHTML = '<i class="fa-regular fa-map me-2"></i>Plan My Trip';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                alert('Error contacting AI service.');
+                btn.innerHTML = '<i class="fa-regular fa-map me-2"></i>Plan My Trip';
+                btn.disabled = false;
+            }
+        });
+    </script>
     <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
 
     <div class="row btns g-2">

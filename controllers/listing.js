@@ -216,3 +216,101 @@ module.exports.deleteListing=(async (req,res)=>{
 
  })
 
+module.exports.aiEstimatePrice = async (req, res) => {
+    try {
+        const { location, category, description } = req.body;
+        if (!location) return res.status(400).json({ error: "Location is required" });
+
+        const prompt = `
+        You are an expert real estate valuer and Airbnb pricing algorithm. 
+        Given the following property details, suggest a competitive, realistic nightly price in USD.
+        Location: ${location}
+        Category: ${category || 'General'}
+        Description: ${description || 'N/A'}
+        
+        Respond ONLY with a single integer number representing the price. Do not include currency symbols or any other text.
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: prompt,
+        });
+
+        const suggestedPrice = parseInt(response.text.replace(/[^0-9]/g, ''));
+        res.json({ success: true, price: suggestedPrice || 150 });
+    } catch (err) {
+        console.error("AI Price Error:", err);
+        res.status(500).json({ error: "Failed to estimate price" });
+    }
+};
+
+module.exports.aiAnalyzeImage = async (req, res) => {
+    try {
+        const { imageBase64 } = req.body;
+        if (!imageBase64) return res.status(400).json({ error: "Image data is required" });
+
+        const prompt = `
+        You are a professional real estate copywriter. Look at this image of a property.
+        Write a short, engaging description (max 3 sentences) highlighting its best visual features and amenities.
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: [
+                prompt,
+                {
+                    inlineData: {
+                        data: imageBase64,
+                        mimeType: "image/jpeg"
+                    }
+                }
+            ]
+        });
+
+        res.json({ success: true, description: response.text.trim() });
+    } catch (err) {
+        console.error("AI Image Error:", err);
+        res.status(500).json({ error: "Failed to analyze image" });
+    }
+};
+
+module.exports.generateAIItinerary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const listing = await Listing.findById(id);
+        if (!listing) return res.status(404).json({ error: "Listing not found" });
+
+        const prompt = `
+        You are an expert local tour guide. Create a fun, adventurous 2-day travel itinerary for a guest staying in: ${listing.location}, ${listing.country}.
+        
+        Format it nicely with Markdown. Keep it relatively concise but engaging. Use emojis.
+        Structure:
+        ### Day 1
+        - Morning: ...
+        - Afternoon: ...
+        - Evening: ...
+        
+        ### Day 2
+        - Morning: ...
+        - Afternoon: ...
+        - Evening: ...
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: prompt,
+        });
+
+        let htmlResponse = response.text
+            .replace(/### (.*)/g, '<h5 class="fw-bold mt-4 text-primary"><i class="fa-solid fa-map-location-dot me-2"></i>$1</h5>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/- (.*)/g, '<li>$1</li>');
+            
+        htmlResponse = htmlResponse.replace(/(<li>.*<\/li>\n*)+/g, '<ul class="text-body-secondary mb-3">$&</ul>');
+
+        res.json({ success: true, itinerary: htmlResponse });
+    } catch (err) {
+        console.error("AI Itinerary Error:", err);
+        res.status(500).json({ error: "Failed to generate itinerary" });
+    }
+};
