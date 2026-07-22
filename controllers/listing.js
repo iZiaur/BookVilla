@@ -223,7 +223,7 @@ module.exports.aiEstimatePrice = async (req, res) => {
 
         const prompt = `
         You are an expert real estate valuer and Airbnb pricing algorithm. 
-        Given the following property details, suggest a competitive, realistic nightly price in USD.
+        Given the following property details, suggest a competitive, realistic nightly price in Indian Rupees (INR).
         Location: ${location}
         Category: ${category || 'General'}
         Description: ${description || 'N/A'}
