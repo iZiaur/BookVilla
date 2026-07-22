@@ -35,6 +35,14 @@ module.exports.renderCheckout = async (req, res) => {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
     
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (checkInDate <= today) {
+        req.flash('error', 'Bookings must start from tomorrow onwards.');
+        return res.redirect(`/listings/${id}`);
+    }
+
     if (checkOutDate <= checkInDate) {
         req.flash('error', 'Check-out date must be after check-in date.');
         return res.redirect(`/listings/${id}`);
@@ -61,6 +69,14 @@ module.exports.initiateBooking = async (req, res) => {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
     
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (checkInDate <= today) {
+        req.flash('error', 'Bookings must start from tomorrow onwards.');
+        return res.redirect(`/listings/${id}`);
+    }
+
     if (checkOutDate <= checkInDate) {
         req.flash('error', 'Check-out date must be after check-in date.');
         return res.redirect(`/listings/${id}`);
