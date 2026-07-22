@@ -28,6 +28,7 @@ const listingRouter=require("./routes/listing.js")
 const reviewRouter=require("./routes/review.js")
 const userRouter=require('./routes/user.js');
 const adminRouter=require('./routes/admin.js');
+const bookingRouter=require('./routes/booking.js');
 var session = require('express-session');
 var flash = require('connect-flash');
 const MongoStore = require('connect-mongo');
@@ -124,6 +125,7 @@ app.use("/listings",listingRouter);
 //Rendering  Routes for review Create and delete operations
 
 app.use("/listings/:id/reviews",reviewRouter)
+app.use("/listings/:id/book", bookingRouter);
 
 app.use('/',userRouter)
 

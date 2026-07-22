@@ -1,5 +1,6 @@
-let User=require("../models/user.js");
-let Listing=require("../models/listing.js");
+let User = require("../models/user.js");
+let Listing = require("../models/listing.js");
+let Booking = require("../models/booking.js");
 
 module.exports.renderSignUpForm=(req,res)=>{
     res.redirect('/login?mode=signup');
@@ -59,6 +60,9 @@ module.exports.renderProfile = async (req, res) => {
         path: 'reviews',
         populate: { path: 'author' }
     });
+
+    // Fetch user's bookings
+    const bookings = await Booking.find({ user: req.user._id }).populate('listing').sort({ createdAt: -1 });
     
-    res.render('users/profile.ejs', { listings });
+    res.render('users/profile.ejs', { listings, bookings });
 };
