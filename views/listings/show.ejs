@@ -187,27 +187,22 @@
                 </button>
             </div>
             
-            <div id="aiSummaryContainer" class="col-12 mb-4 d-none">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #f3e8ff, #e0e7ff);">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3 text-center" style="color: #4f46e5;"><i class="fa-solid fa-robot me-2"></i>AI Review Summary</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3 mb-md-0">
-                                <div class="bg-white p-3 rounded-3 h-100 shadow-sm border border-success border-opacity-25">
-                                    <h6 class="text-success fw-bold"><i class="fa-solid fa-circle-check me-2"></i>The Good</h6>
-                                    <ul id="aiGoodList" class="mb-0 small text-secondary"></ul>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="bg-white p-3 rounded-3 h-100 shadow-sm border border-danger border-opacity-25">
-                                    <h6 class="text-danger fw-bold"><i class="fa-solid fa-flag me-2"></i>Hidden Red Flags</h6>
-                                    <ul id="aiBadList" class="mb-0 small text-secondary"></ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div id="aiSummaryContainer" class="col-12 mb-4 d-none">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="bg-body-tertiary p-3 rounded-3 h-100 shadow-sm border border-success border-opacity-25">
+                    <h6 class="text-success fw-bold"><i class="fa-solid fa-circle-check me-2"></i>The Good</h6>
+                    <ul id="aiGoodList" class="mb-0 small text-body-secondary"></ul>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="bg-body-tertiary p-3 rounded-3 h-100 shadow-sm border border-danger border-opacity-25">
+                    <h6 class="text-danger fw-bold"><i class="fa-solid fa-flag me-2"></i>Hidden Red Flags</h6>
+                    <ul id="aiBadList" class="mb-0 small text-body-secondary"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
             <script>
                 document.getElementById('aiSummaryBtn').addEventListener('click', async () => {

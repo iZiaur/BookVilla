@@ -123,13 +123,14 @@ module.exports.generateAISummary = async (req, res) => {
         You are a brutally honest AI travel assistant. Read the following reviews for a rental property:
         "${reviewsText}"
         
-        Summarize the overall experience. Be highly concise. 
-        Extract the best things into an array called "theGood".
-        Extract any hidden issues, complaints, or annoyances into an array called "redFlags".
+        Analyze the reviews to find the most common patterns.
+        Extract a maximum of 3 of the most repeated positive points into an array called "theGood".
+        Extract a maximum of 3 of the most repeated negative points, complaints, or red flags into an array called "redFlags".
+        Keep each point extremely concise (max 5-7 words).
         
         Respond ONLY with a valid JSON object in this exact format, with no markdown code blocks:
         {
-          "theGood": ["Great location", "Clean"],
+          "theGood": ["Great location", "Clean", "Friendly host"],
           "redFlags": ["Noisy at night", "Slow wifi"]
         }
         `;
