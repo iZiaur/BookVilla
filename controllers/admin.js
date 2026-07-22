@@ -155,6 +155,22 @@ module.exports.seedListings = async (req, res) => {
 
         const adjectives = ["Beautiful", "Stunning", "Peaceful", "Luxurious", "Breathtaking", "Charming", "Spectacular"];
         const categories = Object.keys(categoryImages);
+        
+        const houseRulesOptions = [
+            "No smoking\nNo pets\nQuiet hours 10 PM - 8 AM\nCheck-out at 11 AM",
+            "Pets allowed (max 2)\nNo parties or events\nSelf check-in with keypad\nCheck-out at 10 AM",
+            "No smoking inside\nSuitable for children\nNo loud music after 11 PM\nCheck-out at 12 PM",
+            "Adults only\nNo shoes inside\nEvents allowed upon request\nCheck-out at 11 AM",
+            "Pet friendly\nSmoking allowed in designated areas\nNo unregistered guests\nCheck-out at 10 AM"
+        ];
+
+        const cancellationPolicyOptions = [
+            "Flexible - Full refund up to 24 hours before check-in.",
+            "Moderate - Full refund up to 5 days before check-in.",
+            "Strict - Full refund up to 14 days before check-in, 50% refund afterward.",
+            "Non-refundable - Cancel anytime, but no refund will be provided.",
+            "Super Strict - Full refund up to 30 days before check-in."
+        ];
 
         let generatedListings = [];
         const ownerId = req.user._id;
@@ -164,20 +180,30 @@ module.exports.seedListings = async (req, res) => {
             const randomTitle = titles[Math.floor(Math.random() * titles.length)];
             const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
             const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            const randomHouseRule = houseRulesOptions[Math.floor(Math.random() * houseRulesOptions.length)];
+            const randomPolicy = cancellationPolicyOptions[Math.floor(Math.random() * cancellationPolicyOptions.length)];
             const imgArray = categoryImages[randomCat];
             const matchedImg = imgArray[Math.floor(Math.random() * imgArray.length)];
             const price = Math.floor(Math.random() * 15000) + 1500;
 
             generatedListings.push(new Listing({
                 title: `${randomAdj} ${randomTitle}`,
-                description: `Experience the best of ${randomLoc.loc} in this amazing property. Perfect for vacations, getaways, and making memories.`,
-                image: { url: matchedImg, filename: `seed_img_${i}` },
-                price: price.toString(),
+                description: `Experience luxury and comfort in this amazing property. Perfect for your next getaway with family or friends. Includes modern amenities and breathtaking views.`,
+                image: {
+                    url: matchedImg,
+                    filename: `unsplash_${randomCat}_${i}`
+                },
                 category: randomCat,
+                price: price,
                 location: randomLoc.loc,
                 country: randomLoc.country,
+                houseRules: randomHouseRule,
+                cancellationPolicy: randomPolicy,
                 owner: ownerId,
-                geometry: { type: 'Point', coordinates: randomLoc.coords }
+                geometry: {
+                    type: "Point",
+                    coordinates: randomLoc.coords
+                }
             }));
         }
 

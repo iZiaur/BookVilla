@@ -18,6 +18,39 @@ const User = require("../models/user.js");
 // Seed Route
 router.post("/seed", isAdmin, wrapAsync(adminController.seedListings));
 
+// Temporary Policies Migration Route
+router.get("/migrate-policies", isAdmin, wrapAsync(async (req, res) => {
+    const houseRulesOptions = [
+        "No smoking\nNo pets\nQuiet hours 10 PM - 8 AM\nCheck-out at 11 AM",
+        "Pets allowed (max 2)\nNo parties or events\nSelf check-in with keypad\nCheck-out at 10 AM",
+        "No smoking inside\nSuitable for children\nNo loud music after 11 PM\nCheck-out at 12 PM",
+        "Adults only\nNo shoes inside\nEvents allowed upon request\nCheck-out at 11 AM",
+        "Pet friendly\nSmoking allowed in designated areas\nNo unregistered guests\nCheck-out at 10 AM"
+    ];
+
+    const cancellationPolicyOptions = [
+        "Flexible - Full refund up to 24 hours before check-in.",
+        "Moderate - Full refund up to 5 days before check-in.",
+        "Strict - Full refund up to 14 days before check-in, 50% refund afterward.",
+        "Non-refundable - Cancel anytime, but no refund will be provided.",
+        "Super Strict - Full refund up to 30 days before check-in."
+    ];
+
+    const listings = await Listing.find({});
+    for (let listing of listings) {
+        if (!listing.houseRules || listing.houseRules === "No specific rules provided.") {
+            listing.houseRules = houseRulesOptions[Math.floor(Math.random() * houseRulesOptions.length)];
+        }
+        if (!listing.cancellationPolicy || listing.cancellationPolicy === "Flexible - Full refund up to 24 hours before check-in.") {
+            listing.cancellationPolicy = cancellationPolicyOptions[Math.floor(Math.random() * cancellationPolicyOptions.length)];
+        }
+        await listing.save();
+    }
+
+    req.flash("success", `Successfully applied random policies to ${listings.length} listings!`);
+    res.redirect("/admin");
+}));
+
 // Temporary Ownership Transfer Route
 router.get("/transfer-ownership", isAdmin, wrapAsync(async (req, res) => {
     // Helper function to find or create user

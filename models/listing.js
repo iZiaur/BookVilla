@@ -16,6 +16,14 @@ const listingSchema=new mongoose.Schema({
         enum: ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Artic", "Domes", "Boats"],
         required: true
     },
+    houseRules: {
+        type: String,
+        default: "No specific rules provided."
+    },
+    cancellationPolicy: {
+        type: String,
+        default: "Flexible - Full refund up to 24 hours before check-in."
+    },
     price:String,
     location:String,
     country:String,
