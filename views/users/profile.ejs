@@ -64,7 +64,11 @@
                                         <p class="small text-muted mb-2 text-uppercase fw-bold">Contact Host</p>
                                         <p class="mb-1 fw-semibold"><i class="fa-solid fa-user me-2 text-primary"></i><%= booking.listing.owner.username %></p>
                                         <p class="mb-1 small"><i class="fa-solid fa-envelope me-2 text-secondary"></i><a href="mailto:<%= booking.listing.owner.email %>" class="text-decoration-none"><%= booking.listing.owner.email %></a></p>
-                                        <p class="mb-0 small"><i class="fa-solid fa-phone me-2 text-secondary"></i><%= booking.listing.owner.phone || 'Not provided' %></p>
+                                        <p class="mb-2 small"><i class="fa-solid fa-phone me-2 text-secondary"></i><%= booking.listing.owner.phone || 'Not provided' %></p>
+                                        
+                                        <button class="btn btn-sm btn-outline-primary w-100 rounded-pill mt-2 welcome-guide-btn" data-booking-id="<%= booking._id %>" data-listing-id="<%= booking.listing._id %>">
+                                            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> View Welcome Guide
+                                        </button>
                                     </div>
                                 <% } %>
                                 
@@ -86,7 +90,20 @@
             </div>
         <% } %>
 
-        <h3 class="fw-bold mb-4 border-bottom pb-2">Your Properties (<%= listings.length %>)</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h3 class="fw-bold mb-0">Your Properties (<%= listings.length %>)</h3>
+            <% if(listings.length > 0) { %>
+                <button id="hostAnalyticsBtn" class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold">
+                    <i class="fa-solid fa-chart-line me-2"></i> AI Host Insights
+                </button>
+            <% } %>
+        </div>
+        
+        <div id="hostAnalyticsContainer" class="mb-5 p-4 bg-body-tertiary rounded-4 shadow-sm border d-none">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-robot text-success me-2"></i>AI Business Analysis</h4>
+            <div id="hostAnalyticsContent"></div>
+        </div>
+
         <% if(listings.length === 0) { %>
             <div class="alert bg-body-tertiary border shadow-sm text-center py-4 rounded-4">
                 <i class="fa-solid fa-house-chimney text-muted fs-1 mb-3"></i>
@@ -146,4 +163,86 @@
             </div>
         <% } %>
     </div>
+    </div>
 </div>
+
+<!-- Welcome Guide Modal -->
+<div class="modal fade" id="welcomeGuideModal" tabindex="-1" aria-labelledby="welcomeGuideModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold" id="welcomeGuideModalLabel"><i class="fa-solid fa-envelope-open-text text-primary me-2"></i>Your Personalized Welcome Guide</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4" id="welcomeGuideContent">
+        <!-- Content will be injected here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // --- Host Analytics Dashboard ---
+    const hostAnalyticsBtn = document.getElementById('hostAnalyticsBtn');
+    if (hostAnalyticsBtn) {
+        hostAnalyticsBtn.addEventListener('click', async () => {
+            const container = document.getElementById('hostAnalyticsContainer');
+            const content = document.getElementById('hostAnalyticsContent');
+
+            hostAnalyticsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Analyzing Reviews...';
+            hostAnalyticsBtn.disabled = true;
+
+            try {
+                const response = await fetch('/user/profile/host-analytics');
+                const data = await response.json();
+
+                if (data.success) {
+                    content.innerHTML = data.analytics;
+                    container.classList.remove('d-none');
+                } else {
+                    alert(data.error || 'Failed to generate insights.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error contacting AI service.');
+            } finally {
+                hostAnalyticsBtn.innerHTML = '<i class="fa-solid fa-chart-line me-2"></i> Refresh Insights';
+                hostAnalyticsBtn.disabled = false;
+            }
+        });
+    }
+
+    // --- Welcome Guide Modals ---
+    const welcomeGuideBtns = document.querySelectorAll('.welcome-guide-btn');
+    const welcomeGuideModal = new bootstrap.Modal(document.getElementById('welcomeGuideModal'));
+    const welcomeGuideContent = document.getElementById('welcomeGuideContent');
+
+    welcomeGuideBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const bookingId = btn.getAttribute('data-booking-id');
+            const listingId = btn.getAttribute('data-listing-id');
+            const originalHtml = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Loading...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/listings/${listingId}/book/${bookingId}/welcome-guide`);
+                const data = await response.json();
+
+                if (data.success) {
+                    welcomeGuideContent.innerHTML = data.guide;
+                    welcomeGuideModal.show();
+                } else {
+                    alert(data.error || 'Failed to fetch welcome guide.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error contacting AI service.');
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        });
+    });
+</script>

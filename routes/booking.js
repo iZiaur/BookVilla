@@ -33,5 +33,7 @@ router.get("/:bookingId/pay/success", isLoggedIn, wrapAsync(bookingController.pa
 
 // GET /listings/:id/book/:bookingId/pay/cancel
 router.get("/:bookingId/pay/cancel", isLoggedIn, wrapAsync(bookingController.paymentCancel));
+// GET /listings/:id/book/:bookingId/welcome-guide
+router.get("/:bookingId/welcome-guide", isLoggedIn, wrapAsync(bookingController.getWelcomeGuide));
 
 module.exports = router;

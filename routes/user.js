@@ -7,8 +7,7 @@ const { saveRedirectUrl, isLoggedIn } = require("../routeMiddleware.js");
 const userController=require("../controllers/user.js")
 
 router.get("/profile", isLoggedIn, wrapAsync(userController.renderProfile));
-
-
+router.get("/profile/host-analytics", isLoggedIn, wrapAsync(userController.getHostAnalytics));
 
 router.route("/signup").get(userController.renderSignUpForm).post(wrapAsync(userController.signup))
 

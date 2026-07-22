@@ -262,7 +262,10 @@ module.exports.verifyOTP = async (req, res) => {
     res.redirect(`/listings/${id}/book/${bookingId}/pay`);
 };
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_mock');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const nodemailer = require('nodemailer');
+const { GoogleGenAI } = require('@google/genai');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'mock_key' });
 
 module.exports.renderPayment = async (req, res) => {
     const { id, bookingId } = req.params;
@@ -379,4 +382,44 @@ module.exports.paymentCancel = async (req, res) => {
     const { id, bookingId } = req.params;
     req.flash('error', 'Payment was cancelled. You can complete it later from your profile.');
     res.redirect(`/listings/${id}/book/${bookingId}/pay`);
+};
+
+module.exports.getWelcomeGuide = async (req, res) => {
+    try {
+        const { id, bookingId } = req.params;
+        const booking = await Booking.findById(bookingId).populate('listing');
+        
+        if (!booking) {
+            return res.json({ success: false, error: 'Booking not found.' });
+        }
+
+        if (booking.status !== "Confirmed") {
+            return res.json({ success: false, error: 'Welcome guide is only available for confirmed bookings.' });
+        }
+
+        const prompt = `
+        You are a warm, welcoming Airbnb superhost for the property "${booking.listing.title}" located in ${booking.listing.location}.
+        Write a highly personalized, enthusiastic welcome letter for a guest.
+        Include some quick packing tips and 2-3 local recommendations for things to do or eat in ${booking.listing.location}.
+        Use Markdown formatting and emojis. Keep it under 250 words.
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3.6-flash',
+            contents: prompt,
+        });
+
+        // Convert simple markdown to HTML
+        let htmlResponse = response.text
+            .replace(/### (.*)/g, '<h5 class="fw-bold mt-3 text-primary">$1</h5>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/- (.*)/g, '<li>$1</li>');
+            
+        htmlResponse = htmlResponse.replace(/(<li>.*<\/li>\n*)+/g, '<ul class="text-body-secondary mb-3">$&</ul>');
+
+        res.json({ success: true, guide: htmlResponse });
+    } catch (err) {
+        console.error("AI Welcome Guide Error:", err);
+        res.status(500).json({ success: false, error: "Failed to generate welcome guide." });
+    }
 };
