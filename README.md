@@ -140,7 +140,7 @@ BookVilla/
 │   ├── listings/              # Listing views (Index, Show, Edit, New)
 │   └── users/                 # Auth views (Login, Signup)
 ├── app.js                     # Main server entrypoint
-├── middleware.js              # Auth & validation middlewares
+├── routeMiddleware.js              # Auth & validation middlewares
 ├── cloudConfig.js             # Cloudinary configuration
 └── schema.js                  # Joi validation schemas
 ```

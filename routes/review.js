@@ -5,7 +5,7 @@ const ExpressError=require("../utils/ExpressError.js");
 const Listing=require("../models/listing.js")
 const wrapAsync=require("../utils/wrapAsync.js");
 const Review=require("../models/review.js");
-const {validateReview, isLoggedIn,isAuthor}=require("../middleware.js");
+const {validateReview, isLoggedIn,isAuthor}=require("../routeMiddleware.js");
 const reviewController=require("../controllers/review.js")
 
 // Review Post Route to Add reviews

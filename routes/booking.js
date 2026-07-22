@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 const wrapAsync = require("../utils/wrapAsync");
-const { isLoggedIn, validateBooking } = require("../middleware.js");
+const { isLoggedIn, validateBooking } = require("../routeMiddleware.js");
 const bookingController = require("../controllers/booking.js");
 const multer = require('multer');
 const { storage } = require("../cloudConfig.js");

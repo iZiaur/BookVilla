@@ -2,9 +2,8 @@ const Listing=require("../models/listing.js");
 const Booking = require("../models/booking.js");
 require('dotenv').config()
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
-const mapToken=process.env.MAP_TOKEN;
-console.log(mapToken);
-const geocodingClient = mbxGeocoding({ accessToken: mapToken});
+const mapToken = process.env.MAP_TOKEN || 'placeholder_token_to_prevent_crash_on_boot';
+const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index=(async(req,res)=>{
     let filter = {};

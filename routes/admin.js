@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { isAdmin } = require("../middleware.js");
+const { isAdmin } = require("../routeMiddleware.js");
 const adminController = require("../controllers/admin.js");
 const wrapAsync = require("../utils/wrapAsync");
 
