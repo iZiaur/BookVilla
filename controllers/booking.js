@@ -17,6 +17,46 @@ const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
+// Helper to send confirmation email
+const sendConfirmationEmail = async (booking, userEmail) => {
+    try {
+        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            const finalPrice = booking.totalPrice - (booking.discountAmount || 0);
+            await transporter.sendMail({
+                from: `"BookVilla" <${process.env.EMAIL_USER}>`,
+                to: userEmail,
+                subject: "Booking Confirmed! - BookVilla",
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+                        <div style="background-color: #212529; color: white; padding: 20px; text-align: center;">
+                            <h2 style="margin: 0;">Booking Confirmed! 🎉</h2>
+                        </div>
+                        <div style="padding: 20px; background-color: #f8f9fa;">
+                            <p style="font-size: 16px;">Hi <b>${booking.guestName}</b>,</p>
+                            <p style="font-size: 16px;">Your payment was successful and your reservation at <b>${booking.listing.title}</b> is confirmed.</p>
+                            
+                            <div style="background-color: white; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #ddd;">
+                                <h3 style="margin-top: 0; color: #cc222e;">Booking Details</h3>
+                                <p><b>Check-in:</b> ${new Date(booking.checkIn).toLocaleDateString()}</p>
+                                <p><b>Check-out:</b> ${new Date(booking.checkOut).toLocaleDateString()}</p>
+                                <p><b>Guests:</b> ${booking.numberOfGuests}</p>
+                                <p><b>Location:</b> ${booking.listing.location}, ${booking.listing.country}</p>
+                                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                                <p style="font-size: 18px; margin: 0;"><b>Total Paid:</b> ₹${finalPrice.toLocaleString("en-IN")}</p>
+                            </div>
+                            
+                            <p style="font-size: 14px; color: #666;">You can view more details and contact your host from your <a href="https://book-villa.vercel.app/profile" style="color: #0d6efd;">BookVilla Profile</a>.</p>
+                        </div>
+                    </div>
+                `
+            });
+            console.log("Confirmation email sent to:", userEmail);
+        }
+    } catch (err) {
+        console.error("Failed to send confirmation email:", err);
+    }
+};
+
 module.exports.renderCheckout = async (req, res) => {
     const { id } = req.params;
     const { "booking[checkIn]": checkIn, "booking[checkOut]": checkOut } = req.query;
@@ -282,6 +322,10 @@ module.exports.createCheckoutSession = async (req, res) => {
     if (!process.env.STRIPE_SECRET_KEY) {
         booking.status = "Confirmed";
         await booking.save();
+        
+        // Send confirmation email
+        await sendConfirmationEmail(booking, req.user.email);
+        
         req.flash('success', `Mock Payment Successful! Enjoy your stay at ${booking.listing.title}!`);
         return res.redirect('/profile');
     }
@@ -323,6 +367,9 @@ module.exports.paymentSuccess = async (req, res) => {
 
     booking.status = "Confirmed";
     await booking.save();
+
+    // Send confirmation email
+    await sendConfirmationEmail(booking, req.user.email);
 
     req.flash('success', `Payment Successful! Enjoy your stay at ${booking.listing.title}!`);
     res.redirect('/profile');
