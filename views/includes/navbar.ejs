@@ -21,9 +21,16 @@
    padding:0.5rem 2rem 0.5rem 2rem;
 
 }
+@media (min-width: 768px) {
+  .absolute-center {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
 </style>
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
+  <div class="container-fluid position-relative">
     <a class="navbar-brand" href="/listings" aria-label="BookVilla Home"><i class="fa-regular fa-compass"></i></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -35,7 +42,7 @@
         <a class="nav-link" href="/listings">Explore</a>
         
         </div>
-        <div class="navbar-nav mx-auto my-2 my-md-0 justify-content-center" style="flex: 2; max-width: 500px; width: 100%;">
+        <div class="navbar-nav mx-auto my-2 my-md-0 justify-content-center absolute-center" style="width: 100%; max-width: 500px; z-index: 1050;">
           <form action="/listings/search/vibe" method="POST" class="d-flex align-items-center bg-body-tertiary rounded-pill p-1 shadow-sm border w-100" style="transition: all 0.3s ease;" onsubmit="this.querySelector('button').innerHTML='<i class=\'fa-solid fa-spinner fa-spin\'></i>'">
             <i class="fa-solid fa-wand-magic-sparkles text-primary ms-3 me-2"></i>
             <input type="text" name="vibeQuery" class="form-control bg-transparent border-0 shadow-none" placeholder="Anywhere | Any week | Ask AI..." required>
