@@ -2,6 +2,9 @@ const Booking = require("../models/booking.js");
 const Listing = require("../models/listing.js");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { GoogleGenAI } = require('@google/genai');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'mock_key' });
 
 // Setup Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -298,11 +301,6 @@ module.exports.verifyOTP = async (req, res) => {
     req.flash('success', 'OTP Verified! Please complete your payment to confirm the booking.');
     res.redirect(`/listings/${id}/book/${bookingId}/pay`);
 };
-
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const nodemailer = require('nodemailer');
-const { GoogleGenAI } = require('@google/genai');
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'mock_key' });
 
 module.exports.renderPayment = async (req, res) => {
     const { id, bookingId } = req.params;
