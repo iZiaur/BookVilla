@@ -37,7 +37,7 @@ module.exports.aiVibeSearch = async (req, res) => {
         `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
@@ -51,7 +51,7 @@ module.exports.aiVibeSearch = async (req, res) => {
 
     } catch (err) {
         console.error("AI Vibe Search Error:", err);
-        req.flash('error', 'The AI is currently resting. Please try standard search.');
+        req.flash('error', `AI Error: ${err.message || 'Please try standard search.'}`);
         res.redirect('/listings');
     }
 };
@@ -135,7 +135,7 @@ module.exports.generateAISummary = async (req, res) => {
         `;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
@@ -146,7 +146,7 @@ module.exports.generateAISummary = async (req, res) => {
         res.json({ success: true, summary });
     } catch (err) {
         console.error("AI Summary Error:", err);
-        res.status(500).json({ error: 'Failed to generate AI summary.' });
+        res.status(500).json({ error: `AI Error: ${err.message || 'Failed to generate AI summary.'}` });
     }
 };
 
