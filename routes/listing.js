@@ -18,6 +18,12 @@ router.route("/").get(wrapAsync(listingController.index)).post(isLoggedIn,upload
 
 
 
+// AI Search Route
+router.post("/search/vibe", wrapAsync(listingController.aiVibeSearch));
+
+// AI Summary Route
+router.get("/:id/ai-summary", wrapAsync(listingController.generateAISummary));
+
 // Rest of your routes...
 router.get("/new", isLoggedIn, listingController.renderNewForm);
 router.get("/:id/edit", isLoggedIn, wrapAsync(listingController.editListing));

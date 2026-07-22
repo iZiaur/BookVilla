@@ -4,6 +4,8 @@ require('dotenv').config()
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN || 'placeholder_token_to_prevent_crash_on_boot';
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+const { GoogleGenAI } = require('@google/genai');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'mock_key' });
 
 module.exports.index=(async(req,res)=>{
     let filter = {};
@@ -13,6 +15,46 @@ module.exports.index=(async(req,res)=>{
     const alllistings=await Listing.find(filter).sort({ _id: -1 }).lean();
     res.render("listings/index.ejs",{alllistings})
 })
+
+module.exports.aiVibeSearch = async (req, res) => {
+    const { vibeQuery } = req.body;
+    if (!vibeQuery) return res.redirect('/listings');
+    if (!process.env.GEMINI_API_KEY) {
+        req.flash('error', 'Gemini API Key is missing. AI Search is currently disabled.');
+        return res.redirect('/listings');
+    }
+
+    try {
+        const allListings = await Listing.find().select('_id title description category location').lean();
+        
+        const prompt = `
+        You are an expert travel agent. The user is asking for: "${vibeQuery}"
+        Here is a list of all available properties in JSON format:
+        ${JSON.stringify(allListings)}
+        
+        Analyze the vibe and semantic meaning of the user's request. Find the top 3 properties that best match the vibe.
+        Respond ONLY with a valid JSON array containing the exact _id strings of the best matching properties, like this: ["id1", "id2", "id3"]. Do not include markdown formatting or any other text.
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
+
+        let textResponse = response.text;
+        textResponse = textResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        const matchedIds = JSON.parse(textResponse);
+
+        const matchedListings = await Listing.find({ _id: { $in: matchedIds } }).lean();
+        req.flash('success', `Found ${matchedListings.length} matching properties for your vibe!`);
+        res.render("listings/index.ejs", { alllistings: matchedListings });
+
+    } catch (err) {
+        console.error("AI Vibe Search Error:", err);
+        req.flash('error', 'The AI is currently resting. Please try standard search.');
+        res.redirect('/listings');
+    }
+};
 
 module.exports.renderNewForm=(req,res)=>{
     
@@ -61,6 +103,52 @@ module.exports.showListing=(async(req,res)=>{
 
     res.render("listings/show.ejs",{listing, bookedDates, hostAverageRating, totalHostReviews: totalReviews});
 })
+
+module.exports.generateAISummary = async (req, res) => {
+    const { id } = req.params;
+    
+    if (!process.env.GEMINI_API_KEY) {
+        return res.status(400).json({ error: 'Gemini API Key is missing.' });
+    }
+
+    try {
+        let listing = await Listing.findById(id).populate("reviews");
+        if (!listing || !listing.reviews || listing.reviews.length === 0) {
+            return res.status(400).json({ error: 'Not enough reviews to summarize.' });
+        }
+
+        const reviewsText = listing.reviews.map(r => r.comment).join(" | ");
+
+        const prompt = `
+        You are a brutally honest AI travel assistant. Read the following reviews for a rental property:
+        "${reviewsText}"
+        
+        Summarize the overall experience. Be highly concise. 
+        Extract the best things into an array called "theGood".
+        Extract any hidden issues, complaints, or annoyances into an array called "redFlags".
+        
+        Respond ONLY with a valid JSON object in this exact format, with no markdown code blocks:
+        {
+          "theGood": ["Great location", "Clean"],
+          "redFlags": ["Noisy at night", "Slow wifi"]
+        }
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
+
+        let textResponse = response.text;
+        textResponse = textResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        const summary = JSON.parse(textResponse);
+
+        res.json({ success: true, summary });
+    } catch (err) {
+        console.error("AI Summary Error:", err);
+        res.status(500).json({ error: 'Failed to generate AI summary.' });
+    }
+};
 
 module.exports.createListing=(async(req,res,next)=>{
           let coordinates= await geocodingClient.forwardGeocode({

@@ -179,8 +179,70 @@
         
         
         <% if(listing.reviews.length>0){%>
-        <div class="row">
-            <p><b>All Reviews</b></p>
+        <div class="row position-relative">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="m-0 fs-5"><b>All Reviews</b></p>
+                <button id="aiSummaryBtn" class="btn btn-sm btn-primary rounded-pill px-3 py-2" style="background: linear-gradient(45deg, #7c3aed, #4f46e5); border: none;">
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Generate Honest AI Summary
+                </button>
+            </div>
+            
+            <div id="aiSummaryContainer" class="col-12 mb-4 d-none">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #f3e8ff, #e0e7ff);">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3 text-center" style="color: #4f46e5;"><i class="fa-solid fa-robot me-2"></i>AI Review Summary</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="bg-white p-3 rounded-3 h-100 shadow-sm border border-success border-opacity-25">
+                                    <h6 class="text-success fw-bold"><i class="fa-solid fa-circle-check me-2"></i>The Good</h6>
+                                    <ul id="aiGoodList" class="mb-0 small text-secondary"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="bg-white p-3 rounded-3 h-100 shadow-sm border border-danger border-opacity-25">
+                                    <h6 class="text-danger fw-bold"><i class="fa-solid fa-flag me-2"></i>Hidden Red Flags</h6>
+                                    <ul id="aiBadList" class="mb-0 small text-secondary"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.getElementById('aiSummaryBtn').addEventListener('click', async () => {
+                    const btn = document.getElementById('aiSummaryBtn');
+                    const container = document.getElementById('aiSummaryContainer');
+                    const goodList = document.getElementById('aiGoodList');
+                    const badList = document.getElementById('aiBadList');
+
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Analyzing Reviews...';
+                    btn.disabled = true;
+
+                    try {
+                        const response = await fetch('/listings/<%=listing._id%>/ai-summary');
+                        const data = await response.json();
+
+                        if (data.success) {
+                            goodList.innerHTML = data.summary.theGood.map(item => `<li>${item}</li>`).join('');
+                            badList.innerHTML = data.summary.redFlags.length > 0 ? 
+                                data.summary.redFlags.map(item => `<li>${item}</li>`).join('') : 
+                                '<li><i>No major red flags found!</i></li>';
+                            
+                            container.classList.remove('d-none');
+                            btn.style.display = 'none';
+                        } else {
+                            alert(data.error || 'Failed to generate summary.');
+                            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles me-2"></i>Try Again';
+                            btn.disabled = false;
+                        }
+                    } catch (error) {
+                        alert('Error contacting AI service.');
+                        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles me-2"></i>Try Again';
+                        btn.disabled = false;
+                    }
+                });
+            </script>
         <% for (review of listing.reviews){ %>
             
            <div class="card col-12 col-md-5 ms-3 mb-3">
