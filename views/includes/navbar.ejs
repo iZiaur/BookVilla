@@ -54,18 +54,21 @@
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa-solid fa-user-circle fs-5"></i>
               </a>
-              <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="navbarDropdown">
-                <li class="px-3 py-2 border-bottom mb-1">
-                  <span class="d-block fw-bold text-dark"><%= currUser.username %></span>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="navbarDropdown" style="min-width: 260px;">
+                <li class="px-3 py-3 border-bottom mb-2 text-center">
+                  <div class="mb-2">
+                    <i class="fa-solid fa-circle-user text-primary" style="font-size: 3.5rem;"></i>
+                  </div>
+                  <span class="d-block fw-bold text-dark fs-5"><%= currUser.username %></span>
                   <small class="text-muted"><%= currUser.email %></small>
                 </li>
-                <li><a class="dropdown-item fw-semibold" href="/profile"><i class="fa-solid fa-suitcase-rolling me-2 text-info"></i>Booking History</a></li>
-                <li><a class="dropdown-item fw-semibold" href="/profile"><i class="fa-solid fa-id-badge me-2 text-primary"></i>Your Profile</a></li>
+                <li><a class="dropdown-item fw-semibold py-2" href="/profile"><i class="fa-solid fa-suitcase-rolling me-3 text-info"></i>Booking History</a></li>
+                <li><a class="dropdown-item fw-semibold py-2" href="/profile"><i class="fa-solid fa-id-badge me-3 text-primary"></i>Your Profile</a></li>
                 <% if(currUser.username === 'admin' || (process.env.ADMIN_EMAIL && currUser.email === process.env.ADMIN_EMAIL)) { %>
-                  <li><a class="dropdown-item fw-semibold" href="/admin"><i class="fa-solid fa-shield-halved me-2 text-warning"></i>Admin Panel</a></li>
+                  <li><a class="dropdown-item fw-semibold py-2" href="/admin"><i class="fa-solid fa-shield-halved me-3 text-warning"></i>Admin Panel</a></li>
                 <% } %>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item fw-semibold text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Log out</a></li>
+                <li><a class="dropdown-item fw-semibold text-danger py-2" href="/logout"><i class="fa-solid fa-right-from-bracket me-3"></i>Log out</a></li>
               </ul>
             </div>
          <% } %>
