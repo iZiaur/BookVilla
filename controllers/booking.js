@@ -33,7 +33,11 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                 You are a warm, welcoming Airbnb superhost for the property "${booking.listing.title}" located in ${booking.listing.location}.
                 Write a highly personalized, enthusiastic welcome letter for a guest named ${booking.guestName}.
                 Include some quick packing tips and 2-3 local recommendations for things to do or eat in ${booking.listing.location}.
-                Use Markdown formatting and emojis. Keep it under 200 words.
+                IMPORTANT: 
+                - Use very few emojis (max 2 total). 
+                - Format the output strictly as valid HTML using <p>, <ul>, <li>, <strong>, and <h4 style="color: #0d6efd; margin-top: 15px; margin-bottom: 5px;"> tags.
+                - Do NOT use Markdown. Do NOT wrap in \`\`\`html blocks.
+                - Keep it under 200 words and well-structured.
                 `;
 
                 const response = await ai.models.generateContent({
@@ -41,12 +45,7 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                     contents: prompt,
                 });
 
-                let htmlResponse = response.text
-                    .replace(/### (.*)/g, '<h4 style="color: #0d6efd; margin-top: 15px; margin-bottom: 5px;">$1</h4>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/- (.*)/g, '<li style="margin-bottom: 5px;">$1</li>');
-                    
-                htmlResponse = htmlResponse.replace(/(<li.*<\/li>\n*)+/g, '<ul style="padding-left: 20px; color: #555;">$&</ul>');
+                let htmlResponse = response.text.replace(/```html|```/g, '').trim();
                 
                 aiWelcomeGuideHTML = `
                 <div style="background-color: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #ced4da;">
@@ -436,7 +435,11 @@ module.exports.getWelcomeGuide = async (req, res) => {
         You are a warm, welcoming Airbnb superhost for the property "${booking.listing.title}" located in ${booking.listing.location}.
         Write a highly personalized, enthusiastic welcome letter for a guest.
         Include some quick packing tips and 2-3 local recommendations for things to do or eat in ${booking.listing.location}.
-        Use Markdown formatting and emojis. Keep it under 250 words.
+        IMPORTANT: 
+        - Use very few emojis (max 2 total). 
+        - Format the output strictly as valid HTML using <p>, <ul>, <li>, <strong>, and <h5 class="fw-bold mt-3 text-primary"> tags.
+        - Do NOT use Markdown. Do NOT wrap in \`\`\`html blocks.
+        - Keep it well-structured and under 250 words.
         `;
 
         const response = await ai.models.generateContent({
@@ -444,13 +447,7 @@ module.exports.getWelcomeGuide = async (req, res) => {
             contents: prompt,
         });
 
-        // Convert simple markdown to HTML
-        let htmlResponse = response.text
-            .replace(/### (.*)/g, '<h5 class="fw-bold mt-3 text-primary">$1</h5>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/- (.*)/g, '<li>$1</li>');
-            
-        htmlResponse = htmlResponse.replace(/(<li>.*<\/li>\n*)+/g, '<ul class="text-body-secondary mb-3">$&</ul>');
+        let htmlResponse = response.text.replace(/```html|```/g, '').trim();
 
         res.json({ success: true, guide: htmlResponse });
     } catch (err) {
