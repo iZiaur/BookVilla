@@ -142,3 +142,33 @@ body{
         flex-direction: column; */
     }
 }
+
+/* Dark Mode Overrides for Better Visibility */
+[data-bs-theme="dark"] body {
+    background-color: #121212;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+}
+
+[data-bs-theme="dark"] .bg-body-tertiary {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+[data-bs-theme="dark"] .bg-body {
+    background-color: #121212 !important;
+}
+
+[data-bs-theme="dark"] .navbar {
+    background-color: #1e1e1e !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+[data-bs-theme="dark"] .f-info {
+    background-color: #1e1e1e !important;
+    border-top: 1px solid #333 !important;
+}
