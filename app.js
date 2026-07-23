@@ -119,11 +119,14 @@ app.get("/test-ai", async (req, res) => {
     try {
         const { GoogleGenAI } = require('@google/genai');
         const Groq = require("groq-sdk");
+        const OpenAI = require("openai");
         
         let geminiResult = "Not tested";
         let groqResult = "Not tested";
+        let openaiResult = "Not tested";
         let geminiStatus = "pending";
         let groqStatus = "pending";
+        let openaiStatus = "pending";
         
         // Test Gemini
         try {
@@ -155,16 +158,37 @@ app.get("/test-ai", async (req, res) => {
             groqResult = e.message;
             groqStatus = "FAILED";
         }
+
+        // Test OpenAI
+        try {
+            if (!process.env.OPENAI_API_KEY) {
+                throw new Error("OPENAI_API_KEY is not set in environment variables");
+            }
+            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+            const openAiResponse = await openai.chat.completions.create({
+                messages: [{ role: "user", content: "Say 'Hello from OpenAI!'" }],
+                model: "gpt-4o-mini",
+            });
+            openaiResult = openAiResponse.choices[0]?.message?.content;
+            openaiStatus = "SUCCESS";
+        } catch (e) {
+            openaiResult = e.message;
+            openaiStatus = "FAILED";
+        }
         
         res.send(`
             <h1>AI API Diagnostic Test</h1>
             <div style="padding: 20px; border: 2px solid ${geminiStatus === 'SUCCESS' ? 'green' : 'red'}; margin-bottom: 20px;">
-                <h2>Gemini Status: ${geminiStatus}</h2>
+                <h2>1. Gemini Status: ${geminiStatus}</h2>
                 <p><strong>Response:</strong> ${geminiResult}</p>
             </div>
-            <div style="padding: 20px; border: 2px solid ${groqStatus === 'SUCCESS' ? 'green' : 'red'};">
-                <h2>Groq Status: ${groqStatus}</h2>
+            <div style="padding: 20px; border: 2px solid ${groqStatus === 'SUCCESS' ? 'green' : 'red'}; margin-bottom: 20px;">
+                <h2>2. Groq Status (Fallback): ${groqStatus}</h2>
                 <p><strong>Response:</strong> ${groqResult}</p>
+            </div>
+            <div style="padding: 20px; border: 2px solid ${openaiStatus === 'SUCCESS' ? 'green' : 'red'};">
+                <h2>3. OpenAI Status (Tertiary Fallback): ${openaiStatus}</h2>
+                <p><strong>Response:</strong> ${openaiResult}</p>
             </div>
         `);
     } catch (e) {
