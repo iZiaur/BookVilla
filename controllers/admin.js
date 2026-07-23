@@ -12,6 +12,7 @@ module.exports.renderDashboard = async (req, res) => {
         const recentUsers = await User.find({}).sort({ _id: -1 }).limit(10).lean();
 
         // Fetch recent bookings for the Activity Log
+        const Booking = require("../models/booking.js");
         const recentActivity = await Booking.find({})
             .populate('user')
             .populate({
