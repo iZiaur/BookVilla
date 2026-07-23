@@ -53,6 +53,9 @@
                             <p class="card-text text-muted mb-3" style="font-size: 0.85rem;">
                                 <i class="fa-regular fa-clock me-1"></i> Joined: <%= user._id.getTimestamp().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
                             </p>
+                            <a href="/admin/users/<%= user._id %>/activity" class="btn btn-outline-info w-100 mb-2">
+                                <i class="fa-solid fa-chart-line me-1"></i> View Activity Report
+                            </a>
                             
                             <% if (user.email.toLowerCase().trim() !== process.env.ADMIN_EMAIL.toLowerCase().trim()) { %>
                                 <form method="POST" action="/admin/users/<%= user._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this guest? ALL their bookings and activities will be permanently deleted.');">
@@ -88,6 +91,9 @@
                             <p class="card-text text-muted mb-3" style="font-size: 0.85rem;">
                                 <i class="fa-regular fa-clock me-1"></i> Joined: <%= user._id.getTimestamp().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
                             </p>
+                            <a href="/admin/users/<%= user._id %>/activity" class="btn btn-outline-info w-100 mb-2">
+                                <i class="fa-solid fa-chart-line me-1"></i> View Activity Report
+                            </a>
                             
                             <% if (user.email.toLowerCase().trim() !== process.env.ADMIN_EMAIL.toLowerCase().trim()) { %>
                                 <form method="POST" action="/admin/users/<%= user._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this owner? ALL their listings, bookings, and reviews will be permanently deleted.');">
