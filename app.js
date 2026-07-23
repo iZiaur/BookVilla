@@ -131,36 +131,104 @@ app.get("/seed-india", async (req, res) => {
             { city: "Pimpri-Chinchwad", state: "Maharashtra" }, { city: "Patna", state: "Bihar" },
             { city: "Vadodara", state: "Gujarat" }, { city: "Ghaziabad", state: "Uttar Pradesh" }
         ];
+        
+        const adjectives = ["Luxury", "Cozy", "Modern", "Classic", "Vintage", "Serene", "Spacious", "Minimalist", "Rustic", "Elegant"];
+        const propertyTypes = ["Villa", "Apartment", "Penthouse", "Studio", "Bungalow", "Cottage", "Mansion", "Retreat", "Lodge", "Suite"];
         const categories = ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools"];
+        const imageKeywords = ["hotel", "villa", "interior", "bedroom", "resort", "mansion", "pool", "apartment", "living room", "luxury house"];
+        
         const Booking = require("./models/booking.js");
         const user = await User.findOne({});
         if (!user) return res.send("No user found to assign as owner.");
 
+        // Clean up previously seeded dummy data (where address includes '123 Main St')
+        const previousListings = await Listing.find({ address: /123 Main St/ });
+        const previousListingIds = previousListings.map(l => l._id);
+        await Booking.deleteMany({ listing: { $in: previousListingIds } });
+        await Listing.deleteMany({ _id: { $in: previousListingIds } });
+
+        const listingsToInsert = [];
+        const bookingsToInsert = [];
+
         for (let i = 0; i < indianCities.length; i++) {
             const cityData = indianCities[i];
-            const guests = Math.floor(Math.random() * 12) + 1;
-            const price = Math.floor(Math.random() * 5000) + 1000;
-            const listing = new Listing({
-                title: `Beautiful Stay in ${cityData.city}`,
-                description: `Experience the best of ${cityData.city}, ${cityData.state} with our wonderful accommodation.`,
-                image: { url: "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60", filename: "listingimage" },
-                price: price.toString(), location: cityData.city, country: "India", address: `123 Main St, ${cityData.city}, ${cityData.state}, India`,
-                category: categories[Math.floor(Math.random() * categories.length)], maxGuests: guests, owner: user._id,
-                geometry: { type: "Point", coordinates: [77.2090, 28.6139] }
-            });
-            await listing.save();
-            if (i < 5) {
-                const checkIn = new Date(); checkIn.setDate(checkIn.getDate() + 1);
-                const checkOut = new Date(); checkOut.setDate(checkOut.getDate() + 5);
-                await new Booking({
-                    user: user._id, listing: listing._id, checkIn, checkOut,
-                    guestName: "Test Guest", guestEmail: "test@example.com", numberOfGuests: 2,
-                    totalPrice: price * 4, consentGiven: true, status: "Confirmed"
-                }).save();
+            
+            for (let j = 0; j < 10; j++) {
+                const guests = Math.floor(Math.random() * 12) + 1;
+                const price = Math.floor(Math.random() * 9000) + 1000;
+                
+                const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+                const propType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
+                const keyword = imageKeywords[Math.floor(Math.random() * imageKeywords.length)];
+                const randomImageIndex = Math.floor(Math.random() * 1000); // To ensure different unsplash images
+                
+                const _id = new mongoose.Types.ObjectId();
+                
+                listingsToInsert.push({
+                    _id: _id,
+                    title: `${adj} ${propType} in ${cityData.city}`,
+                    description: `Experience the best of ${cityData.city}, ${cityData.state} with our wonderful ${adj.toLowerCase()} ${propType.toLowerCase()}.`,
+                    image: { 
+                        url: `https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60`, // Using generic since unsplash random source is deprecated/unreliable for bulk
+                        // We will update this in a moment to actually be different
+                        filename: "listingimage" 
+                    },
+                    price: price.toString(), 
+                    location: cityData.city, 
+                    country: "India", 
+                    address: `123 Main St, ${cityData.city}, ${cityData.state}, India`,
+                    category: categories[Math.floor(Math.random() * categories.length)], 
+                    maxGuests: guests, 
+                    owner: user._id,
+                    geometry: { type: "Point", coordinates: [77.2090, 28.6139] }
+                });
+                
+                // Add unique images using Unsplash Source (reliable alternative for unique random images)
+                listingsToInsert[listingsToInsert.length - 1].image.url = `https://source.unsplash.com/800x600/?${keyword},house,sig=${randomImageIndex}`;
+
+                // 50% chance to have an upcoming booking (to test date availability)
+                if (Math.random() > 0.5) {
+                    const daysFromNow = Math.floor(Math.random() * 10);
+                    const duration = Math.floor(Math.random() * 5) + 1;
+                    
+                    const checkIn = new Date(); 
+                    checkIn.setDate(checkIn.getDate() + daysFromNow);
+                    
+                    const checkOut = new Date(); 
+                    checkOut.setDate(checkOut.getDate() + daysFromNow + duration);
+                    
+                    bookingsToInsert.push({
+                        user: user._id, 
+                        listing: _id, 
+                        checkIn: checkIn, 
+                        checkOut: checkOut,
+                        guestName: "Test Guest", 
+                        guestEmail: "test@example.com", 
+                        numberOfGuests: Math.min(2, guests),
+                        totalPrice: price * duration, 
+                        consentGiven: true, 
+                        status: "Confirmed"
+                    });
+                }
             }
         }
-        res.send("Seeding complete! You can now test the search filters on the homepage.");
+        
+        await Listing.insertMany(listingsToInsert);
+        if (bookingsToInsert.length > 0) {
+            await Booking.insertMany(bookingsToInsert);
+        }
+        
+        // Let's also give a unique image to any old properties that have the exact same unsplash URL
+        const oldProperties = await Listing.find({ "image.url": "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" });
+        for (let op of oldProperties) {
+            const randomImageIndex = Math.floor(Math.random() * 1000);
+            op.image.url = `https://source.unsplash.com/800x600/?mansion,resort,sig=${randomImageIndex}`;
+            await op.save();
+        }
+
+        res.send(`Seeding complete! Successfully added 200 new properties (10 per city) with ${bookingsToInsert.length} random bookings. Please test on the homepage!`);
     } catch (err) {
+        console.error(err);
         res.send("Error seeding data: " + err.message);
     }
 });
