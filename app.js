@@ -120,16 +120,26 @@ app.use('/admin', adminRouter)
 app.get("/seed-india", async (req, res) => {
     try {
         const indianCities = [
-            { city: "Mumbai", state: "Maharashtra" }, { city: "Delhi", state: "Delhi" },
-            { city: "Bangalore", state: "Karnataka" }, { city: "Hyderabad", state: "Telangana" },
-            { city: "Ahmedabad", state: "Gujarat" }, { city: "Chennai", state: "Tamil Nadu" },
-            { city: "Kolkata", state: "West Bengal" }, { city: "Pune", state: "Maharashtra" },
-            { city: "Jaipur", state: "Rajasthan" }, { city: "Lucknow", state: "Uttar Pradesh" },
-            { city: "Kanpur", state: "Uttar Pradesh" }, { city: "Nagpur", state: "Maharashtra" },
-            { city: "Indore", state: "Madhya Pradesh" }, { city: "Thane", state: "Maharashtra" },
-            { city: "Bhopal", state: "Madhya Pradesh" }, { city: "Visakhapatnam", state: "Andhra Pradesh" },
-            { city: "Pimpri-Chinchwad", state: "Maharashtra" }, { city: "Patna", state: "Bihar" },
-            { city: "Vadodara", state: "Gujarat" }, { city: "Ghaziabad", state: "Uttar Pradesh" }
+            { city: "Mumbai", state: "Maharashtra", lat: 19.0760, lng: 72.8777 },
+            { city: "Delhi", state: "Delhi", lat: 28.6139, lng: 77.2090 },
+            { city: "Bangalore", state: "Karnataka", lat: 12.9716, lng: 77.5946 },
+            { city: "Hyderabad", state: "Telangana", lat: 17.3850, lng: 78.4867 },
+            { city: "Ahmedabad", state: "Gujarat", lat: 23.0225, lng: 72.5714 },
+            { city: "Chennai", state: "Tamil Nadu", lat: 13.0827, lng: 80.2707 },
+            { city: "Kolkata", state: "West Bengal", lat: 22.5726, lng: 88.3639 },
+            { city: "Pune", state: "Maharashtra", lat: 18.5204, lng: 73.8567 },
+            { city: "Jaipur", state: "Rajasthan", lat: 26.9124, lng: 75.7873 },
+            { city: "Lucknow", state: "Uttar Pradesh", lat: 26.8467, lng: 80.9462 },
+            { city: "Kanpur", state: "Uttar Pradesh", lat: 26.4499, lng: 80.3319 },
+            { city: "Nagpur", state: "Maharashtra", lat: 21.1458, lng: 79.0882 },
+            { city: "Indore", state: "Madhya Pradesh", lat: 22.7196, lng: 75.8577 },
+            { city: "Thane", state: "Maharashtra", lat: 19.1974, lng: 72.9781 },
+            { city: "Bhopal", state: "Madhya Pradesh", lat: 23.2599, lng: 77.4126 },
+            { city: "Visakhapatnam", state: "Andhra Pradesh", lat: 17.6868, lng: 83.2185 },
+            { city: "Pimpri-Chinchwad", state: "Maharashtra", lat: 18.6298, lng: 73.7997 },
+            { city: "Patna", state: "Bihar", lat: 25.5941, lng: 85.1376 },
+            { city: "Vadodara", state: "Gujarat", lat: 22.3072, lng: 73.1812 },
+            { city: "Ghaziabad", state: "Uttar Pradesh", lat: 28.6692, lng: 77.4538 }
         ];
         
         const adjectives = ["Luxury", "Cozy", "Modern", "Classic", "Vintage", "Serene", "Spacious", "Minimalist", "Rustic", "Elegant"];
@@ -210,7 +220,14 @@ app.get("/seed-india", async (req, res) => {
                     category: categories[Math.floor(Math.random() * categories.length)], 
                     maxGuests: guests, 
                     owner: user._id,
-                    geometry: { type: "Point", coordinates: [77.2090, 28.6139] }
+                    // Mapbox uses [longitude, latitude]. Add a tiny random offset (-0.02 to +0.02) so markers don't stack exactly on top of each other.
+                    geometry: { 
+                        type: "Point", 
+                        coordinates: [
+                            cityData.lng + (Math.random() * 0.04 - 0.02),
+                            cityData.lat + (Math.random() * 0.04 - 0.02)
+                        ] 
+                    }
                 });
 
                 // 50% chance to have an upcoming booking (to test date availability)
