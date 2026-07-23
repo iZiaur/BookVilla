@@ -16,24 +16,115 @@ module.exports.index=(async(req,res)=>{
     res.render("listings/index.ejs",{alllistings})
 })
 
-module.exports.aiVibeSearch = async (req, res) => {
-    const { vibeQuery } = req.body;
-    if (!vibeQuery) return res.redirect('/listings');
-    if (!process.env.GEMINI_API_KEY) {
-        req.flash('error', 'Gemini API Key is missing. AI Search is currently disabled.');
-        return res.redirect('/listings');
-    }
-
+module.exports.autocomplete = async (req, res) => {
     try {
-        const allListings = await Listing.find().select('_id title description category location').lean();
+        const query = req.query.q;
+        if (!query || query.length < 2) return res.json({ suggestions: [] });
+        
+        // Search by location, country, or title
+        const regex = new RegExp(query, 'i');
+        const listings = await Listing.find({
+            $or: [
+                { location: regex },
+                { country: regex },
+                { title: regex }
+            ]
+        }).select('location country title').limit(5).lean();
+
+        // Extract unique locations to suggest
+        const suggestions = new Set();
+        listings.forEach(listing => {
+            if (listing.location.toLowerCase().includes(query.toLowerCase()) || 
+                listing.country.toLowerCase().includes(query.toLowerCase())) {
+                suggestions.add(`${listing.location}, ${listing.country}`);
+            } else {
+                suggestions.add(listing.title);
+            }
+        });
+
+        res.json({ suggestions: Array.from(suggestions) });
+    } catch (err) {
+        console.error("Autocomplete error:", err);
+        res.status(500).json({ suggestions: [] });
+    }
+};
+
+module.exports.advancedSearch = async (req, res) => {
+    try {
+        const { search, checkIn, checkOut, guests } = req.query;
+        let filter = {};
+
+        // 1. Location matching
+        if (search) {
+            const regex = new RegExp(search, 'i');
+            filter.$or = [
+                { location: regex },
+                { country: regex },
+                { title: regex }
+            ];
+        }
+
+        // 2. Guests matching
+        if (guests) {
+            filter.maxGuests = { $gte: parseInt(guests) };
+        }
+
+        // 3. Date availability checking
+        if (checkIn && checkOut) {
+            const inDate = new Date(checkIn);
+            const outDate = new Date(checkOut);
+            
+            // Find all bookings that overlap with requested dates
+            const overlappingBookings = await Booking.find({
+                status: "Confirmed",
+                $or: [
+                    { checkIn: { $lt: outDate }, checkOut: { $gt: inDate } }
+                ]
+            }).select('listing');
+
+            const bookedListingIds = overlappingBookings.map(b => b.listing);
+            
+            // Exclude booked listings
+            filter._id = { $nin: bookedListingIds };
+        }
+
+        const alllistings = await Listing.find(filter).sort({ _id: -1 }).lean();
+        
+        if (alllistings.length === 0) {
+            req.flash('error', 'No properties found matching your criteria.');
+        } else {
+            req.flash('success', `Found ${alllistings.length} propert${alllistings.length === 1 ? 'y' : 'ies'}!`);
+        }
+        
+        res.render("listings/index.ejs", { alllistings });
+    } catch (err) {
+        console.error("Advanced Search Error:", err);
+        req.flash('error', 'Something went wrong while searching.');
+        res.redirect('/listings');
+    }
+};
+
+module.exports.aiVibeChat = async (req, res) => {
+    try {
+        const { message } = req.body;
+        if (!message) return res.json({ response: "Please tell me what you're looking for!" });
+        
+        if (!process.env.GEMINI_API_KEY) {
+            return res.json({ response: "AI features are currently unavailable (missing API key)." });
+        }
+
+        const allListings = await Listing.find().select('_id title description category location price').lean();
         
         const prompt = `
-        You are an expert travel agent. The user is asking for: "${vibeQuery}"
-        Here is a list of all available properties in JSON format:
+        You are VibeAI, a helpful and friendly travel assistant for BookVilla. 
+        A user just said: "${message}"
+        
+        Here is the JSON list of available properties:
         ${JSON.stringify(allListings)}
         
-        Analyze the vibe and semantic meaning of the user's request. Find the top 3 properties that best match the vibe.
-        Respond ONLY with a valid JSON array containing the exact _id strings of the best matching properties, like this: ["id1", "id2", "id3"]. Do not include markdown formatting or any other text.
+        Your task is to respond naturally to the user, acting as a chatbot. If they ask for recommendations, analyze their vibe and suggest 1 to 3 properties from the list above. 
+        When you suggest a property, you MUST include a clickable HTML link to the property using the format: <a href="/listings/PROPERTY_ID"><strong>Property Title</strong></a>
+        Format your response in simple HTML (using <p>, <br>, <ul>, <li>, <strong>) so it renders nicely in a chat window. Do NOT use markdown. Keep your response concise, friendly, and under 150 words.
         `;
 
         const response = await ai.models.generateContent({
@@ -41,18 +132,12 @@ module.exports.aiVibeSearch = async (req, res) => {
             contents: prompt,
         });
 
-        let textResponse = response.text;
-        textResponse = textResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
-        const matchedIds = JSON.parse(textResponse);
-
-        const matchedListings = await Listing.find({ _id: { $in: matchedIds } }).lean();
-        req.flash('success', `Found ${matchedListings.length} matching properties for your vibe!`);
-        res.render("listings/index.ejs", { alllistings: matchedListings });
+        let textResponse = response.text.replace(/```html|```/g, '').trim();
+        res.json({ response: textResponse });
 
     } catch (err) {
-        console.error("AI Vibe Search Error:", err);
-        req.flash('error', `AI Error: ${err.message || 'Please try standard search.'}`);
-        res.redirect('/listings');
+        console.error("AI Vibe Chat Error:", err);
+        res.json({ response: "Oops, I'm having trouble thinking right now. Please try searching manually!" });
     }
 };
 

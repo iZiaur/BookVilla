@@ -62,5 +62,121 @@
             }
         });
      </script>
+
+    <!-- VibeAI Chatbot Widget -->
+    <div id="vibeAiWidget" class="position-fixed" style="bottom: 20px; left: 20px; z-index: 1050;">
+        <!-- Chat Window -->
+        <div id="vibeAiChatWindow" class="card shadow-lg border-0 d-none" style="width: 320px; height: 400px; border-radius: 1rem; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center p-3 border-0">
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>
+                    <strong class="mb-0">VibeAI</strong>
+                </div>
+                <button type="button" class="btn-close btn-close-white" id="closeVibeAiBtn" aria-label="Close" style="font-size: 0.8rem;"></button>
+            </div>
+            
+            <div class="card-body bg-body-tertiary" id="vibeAiChatBody" style="overflow-y: auto; flex: 1; padding: 15px;">
+                <div class="d-flex mb-3">
+                    <div class="bg-primary text-white p-2 rounded-3 shadow-sm" style="max-width: 85%; font-size: 0.9rem;">
+                        Hi! I'm VibeAI. What kind of vibe are you looking for in your next trip? 🌴✨
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-body border-0 p-2">
+                <form id="vibeAiForm" class="d-flex align-items-center">
+                    <input type="text" id="vibeAiInput" class="form-control rounded-pill border-0 shadow-none bg-body-tertiary px-3" placeholder="Ask me anything..." required style="font-size: 0.9rem;">
+                    <button type="submit" class="btn text-primary p-2 ms-1 rounded-circle" id="vibeAiSendBtn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Floating Button -->
+        <button id="vibeAiToggleBtn" class="btn btn-primary rounded-circle shadow-lg mt-3 d-flex justify-content-center align-items-center" style="width: 56px; height: 56px; background: linear-gradient(45deg, #FF385C, #E61E4D); border: none; transition: transform 0.2s;">
+            <i class="fa-solid fa-wand-magic-sparkles fs-4"></i>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('vibeAiToggleBtn');
+            const chatWindow = document.getElementById('vibeAiChatWindow');
+            const closeBtn = document.getElementById('closeVibeAiBtn');
+            const chatForm = document.getElementById('vibeAiForm');
+            const chatInput = document.getElementById('vibeAiInput');
+            const chatBody = document.getElementById('vibeAiChatBody');
+            const sendBtn = document.getElementById('vibeAiSendBtn');
+
+            // Toggle chat window
+            toggleBtn.addEventListener('click', () => {
+                chatWindow.classList.toggle('d-none');
+                if (!chatWindow.classList.contains('d-none')) {
+                    chatInput.focus();
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                chatWindow.classList.add('d-none');
+            });
+
+            // Handle chat submit
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Add user message to UI
+                appendMessage(message, 'user');
+                chatInput.value = '';
+                
+                // Show loading state
+                sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                sendBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/listings/search/vibe-chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Add AI response to UI
+                    appendMessage(data.response, 'ai');
+                } catch (error) {
+                    console.error('Chat error:', error);
+                    appendMessage("Sorry, I'm having trouble connecting right now.", 'ai');
+                } finally {
+                    sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+                    sendBtn.disabled = false;
+                }
+            });
+
+            function appendMessage(text, sender) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `d-flex mb-3 ${sender === 'user' ? 'justify-content-end' : ''}`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = `p-2 rounded-3 shadow-sm ${sender === 'user' ? 'bg-secondary text-white' : 'bg-primary text-white'}`;
+                bubble.style.maxWidth = '85%';
+                bubble.style.fontSize = '0.9rem';
+                
+                if (sender === 'user') {
+                    bubble.textContent = text;
+                } else {
+                    bubble.innerHTML = text; // AI response is HTML formatted
+                }
+
+                msgDiv.appendChild(bubble);
+                chatBody.appendChild(msgDiv);
+                
+                // Auto-scroll to bottom
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        });
+    </script>
 </body>
 </html>

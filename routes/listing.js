@@ -18,8 +18,14 @@ router.route("/").get(wrapAsync(listingController.index)).post(isLoggedIn,upload
 
 
 
-// AI Search Route
-router.post("/search/vibe", wrapAsync(listingController.aiVibeSearch));
+// Autocomplete Search Route
+router.get("/search/autocomplete", wrapAsync(listingController.autocomplete));
+
+// Advanced Search Route
+router.get("/search", wrapAsync(listingController.advancedSearch));
+
+// AI Search Chatbot Route
+router.post("/search/vibe-chat", wrapAsync(listingController.aiVibeChat));
 
 // AI Price Estimator Route
 router.post("/ai-estimate-price", isLoggedIn, wrapAsync(listingController.aiEstimatePrice));
