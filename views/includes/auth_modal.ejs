@@ -1,0 +1,145 @@
+<!-- Authentication Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 bg-transparent">
+            
+            <!-- Glassmorphism Card -->
+            <div class="card shadow-lg border-0 rounded-4" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.5);">
+                <div class="card-body p-4 p-md-5 position-relative">
+                    
+                    <!-- Close button -->
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="text-center mb-4">
+                        <a href="/listings" class="text-decoration-none d-block mb-2">
+                            <h2 style="color: #dc3545; font-weight: 700;"><i class="fa-regular fa-compass"></i> BookVilla</h2>
+                        </a>
+                    </div>
+                    
+                    <!-- Login Section -->
+                    <div id="modalLoginSection">
+                        <div class="text-center mb-4">
+                            <h4 class="fw-bold">Welcome Back</h4>
+                            <p class="text-muted small">Please log in to your account.</p>
+                        </div>
+                        
+                        <form action="/login" method="POST" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="modal-login-username" class="form-label fw-semibold small">Username or Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-user"></i></span>
+                                    <input type="text" id="modal-login-username" name="username" class="form-control" required placeholder="Enter username or email">
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="modal-login-password" class="form-label fw-semibold small mb-0">Password</label>
+                                    <a href="/forgot-password" class="text-decoration-none text-danger small fw-bold" style="font-size: 0.8rem;">Forgot password?</a>
+                                </div>
+                                <div class="input-group mt-2">
+                                    <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" id="modal-login-password" name="password" class="form-control" required placeholder="Enter password">
+                                    <button class="btn btn-outline-secondary toggle-password bg-body-tertiary" type="button" aria-label="Show password">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-danger w-100 py-2 fw-bold rounded-3 mb-3 mt-4">Log In</button>
+                            
+                            <div class="text-center mt-3">
+                                <span class="text-muted small">New user? </span>
+                                <a href="#" id="modalShowSignupBtn" class="text-decoration-none fw-bold text-body small">Sign up here</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Signup Section -->
+                    <div id="modalSignupSection" class="d-none">
+                        <div class="text-center mb-4">
+                            <h4 class="fw-bold">Create Account</h4>
+                            <p class="text-muted small">Join BookVilla today.</p>
+                        </div>
+                        
+                        <form action="/signup" method="POST" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="modal-signup-username" class="form-label fw-semibold small">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-at"></i></span>
+                                    <input type="text" id="modal-signup-username" name="username" class="form-control" pattern="^[a-zA-Z0-9]+$" title="Username must contain only letters and numbers, with no spaces." required placeholder="Choose a username">
+                                    <div class="invalid-feedback">Letters and numbers only, no spaces.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="modal-signup-email" class="form-label fw-semibold small">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-envelope"></i></span>
+                                    <input type="email" id="modal-signup-email" name="email" class="form-control" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Please provide a valid email address." required placeholder="name@example.com">
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="modal-signup-password" class="form-label fw-semibold small">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-body-tertiary"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" id="modal-signup-password" name="password" class="form-control" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required placeholder="Create a password">
+                                    <button class="btn btn-outline-secondary toggle-password bg-body-tertiary" type="button" aria-label="Show password">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback" style="font-size: 0.75rem;">Min 8 chars, 1 uppercase, 1 lowercase, 1 number.</div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-danger w-100 py-2 fw-bold rounded-3 mb-3">Sign Up</button>
+                            
+                            <div class="text-center mt-3">
+                                <span class="text-muted small">Already have an account? </span>
+                                <a href="#" id="modalShowLoginBtn" class="text-decoration-none fw-bold text-body small">Log in here</a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Aggressively blur the background behind the modal */
+    .modal-backdrop.show {
+        opacity: 1 !important;
+        background-color: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const showSignupBtn = document.getElementById('modalShowSignupBtn');
+        const showLoginBtn = document.getElementById('modalShowLoginBtn');
+        const loginSection = document.getElementById('modalLoginSection');
+        const signupSection = document.getElementById('modalSignupSection');
+        
+        if (showSignupBtn) {
+            showSignupBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                loginSection.classList.add('d-none');
+                signupSection.classList.remove('d-none');
+            });
+        }
+
+        if (showLoginBtn) {
+            showLoginBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                signupSection.classList.add('d-none');
+                loginSection.classList.remove('d-none');
+            });
+        }
+    });
+</script>
