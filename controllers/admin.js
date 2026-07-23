@@ -13,6 +13,19 @@ module.exports.renderDashboard = async (req, res) => {
 
         // Fetch recent bookings for the Activity Log
         const Booking = require("../models/booking.js");
+        const Activity = require("../models/activity.js");
+
+        // Background cleanup for orphaned bookings/activities (from previously deleted users)
+        (async () => {
+            try {
+                const userIds = await User.find().distinct('_id');
+                await Booking.deleteMany({ user: { $nin: userIds } });
+                await Activity.deleteMany({ user: { $nin: userIds } });
+            } catch (e) {
+                console.error("Cleanup error:", e);
+            }
+        })();
+
         const recentActivity = await Booking.find({})
             .populate('user')
             .populate({
@@ -20,10 +33,12 @@ module.exports.renderDashboard = async (req, res) => {
                 populate: { path: 'owner' }
             })
             .sort({ _id: -1 })
-            .limit(50)
             .lean();
+            
+        // Filter out any that might have been fetched before the cleanup finished
+        const validActivity = recentActivity.filter(a => a.user != null).slice(0, 50);
 
-        res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentUsers, recentActivity });
+        res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentUsers, recentActivity: validActivity });
     } catch (err) {
         req.flash("error", "Error loading dashboard.");
         res.redirect("/listings");
