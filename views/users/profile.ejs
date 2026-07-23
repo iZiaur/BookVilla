@@ -233,11 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     content.innerHTML = data.analytics;
                     container.classList.remove('d-none');
                 } else {
-                    alert(data.error || 'Failed to generate insights.');
+                    alert("Our AI analyst is taking a quick break! Please try checking your insights again later.");
                 }
             } catch (error) {
                 console.error(error);
-                alert('Error contacting AI service.');
+                alert("Our AI analyst is taking a quick break! Please try checking your insights again later.");
             } finally {
                 hostAnalyticsBtn.innerHTML = '<i class="fa-solid fa-chart-line me-2"></i> Refresh Insights';
                 hostAnalyticsBtn.disabled = false;
@@ -273,11 +273,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     welcomeGuideContent.innerHTML = data.guide;
                     welcomeGuideModal.show();
                 } else {
-                    alert(data.error || 'Failed to fetch welcome guide.');
+                    alert("Our AI assistant is taking a little nap right now! Please try generating your welcome guide later.");
                 }
             } catch (error) {
                 console.error(error);
-                alert('Error contacting AI service.');
+                alert("Our AI assistant is taking a little nap right now! Please try generating your welcome guide later.");
             } finally {
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;

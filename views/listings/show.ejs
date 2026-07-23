@@ -139,14 +139,24 @@
                     container.classList.remove('d-none');
                     btn.style.display = 'none'; // Hide button after generating
                 } else {
-                    alert(data.error || 'Failed to generate itinerary.');
-                    btn.innerHTML = '<i class="fa-regular fa-map me-2"></i>Plan My Trip';
-                    btn.disabled = false;
+                    // Soft fallback handled by backend, but just in case
+                    content.innerHTML = `<p class="text-muted">Our AI assistant is currently taking a break. Please try again later!</p>`;
+                    container.classList.remove('d-none');
+                    btn.style.display = 'none';
                 }
             } catch (error) {
-                alert('Error contacting AI service.');
-                btn.innerHTML = '<i class="fa-regular fa-map me-2"></i>Plan My Trip';
-                btn.disabled = false;
+                // Network error / 504 Gateway Timeout
+                content.innerHTML = `
+                    <h5 class="fw-bold mt-3 text-primary">Quick Local Guide</h5>
+                    <p>Our AI planner is currently taking a little break! However, here are some general tips for exploring this beautiful area:</p>
+                    <ul class="text-muted">
+                        <li>Don't miss out on the local street food and traditional restaurants.</li>
+                        <li>Check out the main cultural landmarks and nature spots.</li>
+                    </ul>
+                    <p class="small text-muted mt-3">*(AI services are temporarily under maintenance. Please try generating a personalized itinerary again later.)*</p>
+                `;
+                container.classList.remove('d-none');
+                btn.style.display = 'none';
             }
         });
     </script>
