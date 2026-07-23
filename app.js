@@ -135,7 +135,35 @@ app.get("/seed-india", async (req, res) => {
         const adjectives = ["Luxury", "Cozy", "Modern", "Classic", "Vintage", "Serene", "Spacious", "Minimalist", "Rustic", "Elegant"];
         const propertyTypes = ["Villa", "Apartment", "Penthouse", "Studio", "Bungalow", "Cottage", "Mansion", "Retreat", "Lodge", "Suite"];
         const categories = ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools"];
-        const imageKeywords = ["hotel", "villa", "interior", "bedroom", "resort", "mansion", "pool", "apartment", "living room", "luxury house"];
+        
+        // Array of 25 distinct, high-quality Unsplash images for properties
+        const curatedImages = [
+            "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1510798831971-661eb04b3739?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1449844908441-8829872d2607?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1502672260266-1c1c24226133?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1484154218962-a197022b5858?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1598928506311-c55dd189a647?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1558036117-15d82a90b9b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1600585152220-90363fe7e115?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1542853647-49adabe2262a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60"
+        ];
         
         const Booking = require("./models/booking.js");
         const user = await User.findOne({});
@@ -149,6 +177,7 @@ app.get("/seed-india", async (req, res) => {
 
         const listingsToInsert = [];
         const bookingsToInsert = [];
+        let imageCounter = 0;
 
         for (let i = 0; i < indianCities.length; i++) {
             const cityData = indianCities[i];
@@ -159,18 +188,19 @@ app.get("/seed-india", async (req, res) => {
                 
                 const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
                 const propType = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
-                const keyword = imageKeywords[Math.floor(Math.random() * imageKeywords.length)];
-                const randomImageIndex = Math.floor(Math.random() * 1000); // To ensure different unsplash images
                 
                 const _id = new mongoose.Types.ObjectId();
+                
+                // Cycle through the curated images so we don't get the same image over and over
+                const imgUrl = curatedImages[imageCounter % curatedImages.length];
+                imageCounter++;
                 
                 listingsToInsert.push({
                     _id: _id,
                     title: `${adj} ${propType} in ${cityData.city}`,
                     description: `Experience the best of ${cityData.city}, ${cityData.state} with our wonderful ${adj.toLowerCase()} ${propType.toLowerCase()}.`,
                     image: { 
-                        url: `https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60`, // Using generic since unsplash random source is deprecated/unreliable for bulk
-                        // We will update this in a moment to actually be different
+                        url: imgUrl,
                         filename: "listingimage" 
                     },
                     price: price.toString(), 
@@ -182,9 +212,6 @@ app.get("/seed-india", async (req, res) => {
                     owner: user._id,
                     geometry: { type: "Point", coordinates: [77.2090, 28.6139] }
                 });
-                
-                // Add unique images using Unsplash Source (reliable alternative for unique random images)
-                listingsToInsert[listingsToInsert.length - 1].image.url = `https://source.unsplash.com/800x600/?${keyword},house,sig=${randomImageIndex}`;
 
                 // 50% chance to have an upcoming booking (to test date availability)
                 if (Math.random() > 0.5) {
@@ -217,16 +244,8 @@ app.get("/seed-india", async (req, res) => {
         if (bookingsToInsert.length > 0) {
             await Booking.insertMany(bookingsToInsert);
         }
-        
-        // Let's also give a unique image to any old properties that have the exact same unsplash URL
-        const oldProperties = await Listing.find({ "image.url": "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" });
-        for (let op of oldProperties) {
-            const randomImageIndex = Math.floor(Math.random() * 1000);
-            op.image.url = `https://source.unsplash.com/800x600/?mansion,resort,sig=${randomImageIndex}`;
-            await op.save();
-        }
 
-        res.send(`Seeding complete! Successfully added 200 new properties (10 per city) with ${bookingsToInsert.length} random bookings. Please test on the homepage!`);
+        res.send(`Seeding complete! Successfully added 200 new properties (10 per city) with ${bookingsToInsert.length} random bookings. All properties now have distinct curated images.`);
     } catch (err) {
         console.error(err);
         res.send("Error seeding data: " + err.message);
