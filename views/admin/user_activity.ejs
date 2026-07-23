@@ -52,7 +52,7 @@
                         <div class="card shadow-sm border-0 h-100">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                 <span class="fw-bold">Booked: <%= booking.listing ? booking.listing.title : 'Deleted Listing' %></span>
-                                <span class="badge bg-primary rounded-pill"><%= booking.createdAt.toLocaleDateString() %></span>
+                                <span class="badge bg-primary rounded-pill"><%= booking.createdAt ? booking.createdAt.toLocaleDateString() : 'Unknown Date' %></span>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -103,7 +103,7 @@
                     <% for (let activity of userActivities) { %>
                         <li class="list-group-item p-4">
                             <div class="d-flex justify-content-between mb-3">
-                                <span class="badge bg-secondary"><%= activity.createdAt.toLocaleString() %></span>
+                                <span class="badge bg-secondary"><%= activity.createdAt ? activity.createdAt.toLocaleString() : 'Unknown Time' %></span>
                                 <span class="text-muted small"><%= activity.action %></span>
                             </div>
                             
@@ -147,7 +147,7 @@
                                 <p class="card-text text-muted mb-0">"<%= review.comment %>"</p>
                             </div>
                             <div class="card-footer bg-white border-0 text-muted small text-end">
-                                Posted: <%= review.createdAt.toLocaleDateString() %>
+                                Posted: <%= review.createdAt ? review.createdAt.toLocaleDateString() : 'Unknown Date' %>
                             </div>
                         </div>
                     </div>
