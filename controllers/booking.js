@@ -60,9 +60,10 @@ const sendConfirmationEmail = async (booking, userEmail) => {
             }
 
             await transporter.sendMail({
-                from: `"BookVilla" <${process.env.EMAIL_USER}>`,
+                from: `"BookVilla Reservations" <${process.env.EMAIL_USER}>`,
                 to: userEmail,
-                subject: "Booking Confirmed! - BookVilla",
+                subject: "Your Booking Itinerary & Confirmation - BookVilla",
+                text: `Hi ${booking.guestName}, your payment was successful and your reservation at ${booking.listing.title} is confirmed. Check-in: ${new Date(booking.checkIn).toLocaleDateString()}. Total Paid: ₹${finalPrice}. Log in to view your full itinerary and welcome guide.`,
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
                         <div style="background-color: #212529; color: white; padding: 20px; text-align: center;">
@@ -87,7 +88,10 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                             <p style="font-size: 14px; color: #666;">You can view more details and contact your host from your <a href="https://book-villa.vercel.app/profile" style="color: #0d6efd;">BookVilla Profile</a>.</p>
                         </div>
                     </div>
-                `
+                `,
+                headers: {
+                    'X-Entity-Ref-ID': booking._id.toString()
+                }
             });
             console.log("Confirmation email sent to:", userEmail);
         }
@@ -233,10 +237,14 @@ module.exports.initiateBooking = async (req, res) => {
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             await transporter.sendMail({
-                from: `"BookVilla" <${process.env.EMAIL_USER}>`,
+                from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
                 to: req.user.email,
-                subject: "BookVilla - Your Booking OTP",
-                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 5 minutes.</p>`
+                subject: "Action Required: Verify Your Booking",
+                text: `Your Booking Verification Code for ${listing.title} is: ${otp}. This code expires in 5 minutes.`,
+                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 5 minutes.</p>`,
+                headers: {
+                    'X-Entity-Ref-ID': booking._id.toString()
+                }
             });
         }
     } catch (err) {
