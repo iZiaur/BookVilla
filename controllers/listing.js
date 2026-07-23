@@ -56,7 +56,9 @@ module.exports.advancedSearch = async (req, res) => {
 
         // 1. Location matching
         if (search) {
-            const regex = new RegExp(search, 'i');
+            // Extract the city name if the search comes from autocomplete (e.g., "Pune, India")
+            const primarySearchTerm = search.split(',')[0].trim();
+            const regex = new RegExp(primarySearchTerm, 'i');
             filter.$or = [
                 { location: regex },
                 { country: regex },
