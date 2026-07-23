@@ -159,17 +159,17 @@ app.get("/test-ai", async (req, res) => {
             groqStatus = "FAILED";
         }
 
-        // Test OpenAI
+        // Test OpenRouter (Free)
         try {
-            if (!process.env.OPENAI_API_KEY) {
-                throw new Error("OPENAI_API_KEY is not set in environment variables");
+            if (!process.env.OPENROUTER_API_KEY) {
+                throw new Error("OPENROUTER_API_KEY is not set in environment variables");
             }
-            const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-            const openAiResponse = await openai.chat.completions.create({
-                messages: [{ role: "user", content: "Say 'Hello from OpenAI!'" }],
-                model: "gpt-4o-mini",
+            const openrouter = new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY, baseURL: "https://openrouter.ai/api/v1" });
+            const orResponse = await openrouter.chat.completions.create({
+                messages: [{ role: "user", content: "Say 'Hello from OpenRouter!'" }],
+                model: "meta-llama/llama-3-8b-instruct:free",
             });
-            openaiResult = openAiResponse.choices[0]?.message?.content;
+            openaiResult = orResponse.choices[0]?.message?.content;
             openaiStatus = "SUCCESS";
         } catch (e) {
             openaiResult = e.message;
@@ -187,7 +187,7 @@ app.get("/test-ai", async (req, res) => {
                 <p><strong>Response:</strong> ${groqResult}</p>
             </div>
             <div style="padding: 20px; border: 2px solid ${openaiStatus === 'SUCCESS' ? 'green' : 'red'};">
-                <h2>3. OpenAI Status (Tertiary Fallback): ${openaiStatus}</h2>
+                <h2>3. OpenRouter Status (Free Tertiary Fallback): ${openaiStatus}</h2>
                 <p><strong>Response:</strong> ${openaiResult}</p>
             </div>
         `);
