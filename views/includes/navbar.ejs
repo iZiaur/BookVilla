@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (data.suggestions && data.suggestions.length > 0) {
                     dropdown.innerHTML = data.suggestions.map(s => 
-                        `<li><a class="dropdown-item py-2" href="#" onclick="document.getElementById('locationSearchInput').value='${s}'; return false;"><i class="fa-solid fa-location-dot text-muted me-2"></i>${s}</a></li>`
+                        `<li><a class="dropdown-item py-2" href="#" onclick="document.getElementById('locationSearchInput').value='${s}'; bsDropdown.hide(); setTimeout(() => { if(document.getElementById('checkInInput')._flatpickr) document.getElementById('checkInInput')._flatpickr.open(); }, 50); return false;"><i class="fa-solid fa-location-dot text-muted me-2"></i>${s}</a></li>`
                     ).join('');
                     bsDropdown.show();
                 } else {

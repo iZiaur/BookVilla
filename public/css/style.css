@@ -144,8 +144,17 @@ body{
 }
 
 /* Dark Mode Overrides for Better Visibility */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #121212;
+}
+
 [data-bs-theme="dark"] body {
-    background-color: #121212;
+    background-color: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .navbar {
+    background-color: var(--bs-body-bg) !important;
+    border-bottom: 1px solid #333 !important;
 }
 
 [data-bs-theme="dark"] .card {
@@ -160,10 +169,20 @@ body{
 }
 
 [data-bs-theme="dark"] .bg-body {
-    background-color: #121212 !important;
+    background-color: var(--bs-body-bg) !important;
 }
 
 [data-bs-theme="dark"] .f-info {
     background-color: #1e1e1e !important;
     border-top: 1px solid #333 !important;
+}
+
+/* Vibe AI Chatbot styling fixes */
+.vibe-ai-msg a {
+    color: #ffd166 !important;
+    text-decoration: underline;
+    font-weight: 500;
+}
+.vibe-ai-msg a:hover {
+    color: #fff !important;
 }
