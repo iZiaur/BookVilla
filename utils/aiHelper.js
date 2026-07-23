@@ -109,4 +109,6 @@ async function analyzeImage(prompt, imageBase64, mimeType = "image/jpeg") {
             }
         }
     }
+}
+
 module.exports = { generateText, analyzeImage };
