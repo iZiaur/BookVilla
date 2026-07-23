@@ -129,13 +129,11 @@ module.exports.aiVibeChat = async (req, res) => {
         Format your response in simple HTML (using <p>, <br>, <ul>, <li>, <strong>) so it renders nicely in a chat window. Do NOT use markdown. Keep your response concise, friendly, and under 150 words.
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: prompt,
-        });
+        const { generateText } = require('../utils/aiHelper');
+        const textResponse = await generateText(prompt);
 
-        let textResponse = response.text.replace(/```html|```/g, '').trim();
-        res.json({ response: textResponse });
+        let textResponseParsed = textResponse.replace(/```html|```/g, '').trim();
+        res.json({ response: textResponseParsed });
 
     } catch (err) {
         console.error("AI Vibe Chat Error:", err);
@@ -222,14 +220,11 @@ module.exports.generateAISummary = async (req, res) => {
         }
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: prompt,
-        });
+        const { generateText } = require('../utils/aiHelper');
+        const textResponse = await generateText(prompt);
 
-        let textResponse = response.text;
-        textResponse = textResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
-        const summary = JSON.parse(textResponse);
+        let parsedTextResponse = textResponse.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        const summary = JSON.parse(parsedTextResponse);
 
         res.json({ success: true, summary });
     } catch (err) {
@@ -318,12 +313,10 @@ module.exports.aiEstimatePrice = async (req, res) => {
         Respond ONLY with a single integer number representing the price. Do not include currency symbols or any other text.
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: prompt,
-        });
-
-        const suggestedPrice = parseInt(response.text.replace(/[^0-9]/g, ''));
+        const { generateText } = require('../utils/aiHelper');
+        const textResponse = await generateText(prompt);
+        
+        const suggestedPrice = parseInt(textResponse.replace(/[^\d]/g, ''));
         res.json({ success: true, price: suggestedPrice || 150 });
     } catch (err) {
         console.error("AI Price Error:", err);
@@ -336,25 +329,12 @@ module.exports.aiAnalyzeImage = async (req, res) => {
         const { imageBase64 } = req.body;
         if (!imageBase64) return res.status(400).json({ error: "Image data is required" });
 
-        const prompt = `
-        You are a professional real estate copywriter. Look at this image of a property.
-        Write a short, engaging description (max 3 sentences) highlighting its best visual features and amenities.
-        `;
-
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: [
-                prompt,
-                {
-                    inlineData: {
-                        data: imageBase64,
-                        mimeType: "image/jpeg"
-                    }
-                }
-            ]
-        });
-
-        res.json({ success: true, description: response.text.trim() });
+        const prompt = `Analyze this image of a property and provide a concise, engaging description suitable for a short property listing on an Airbnb-like platform. Mention key features visible. Keep it under 50 words.`;
+        
+        const { analyzeImage } = require('../utils/aiHelper');
+        const textResponse = await analyzeImage(prompt, imageBase64);
+        
+        res.json({ success: true, description: textResponse.trim() });
     } catch (err) {
         console.error("AI Image Error:", err);
         res.status(500).json({ error: "Failed to analyze image" });
@@ -388,16 +368,14 @@ module.exports.generateAIItinerary = async (req, res) => {
         - Evening: ...
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: prompt,
-        });
+        const { generateText } = require('../utils/aiHelper');
+        const textResponse = await generateText(prompt);
         
         // Cache the response
-        listing.aiItinerary = response.text;
+        listing.aiItinerary = textResponse;
         await listing.save();
 
-        res.json({ success: true, itinerary: response.text });
+        res.json({ success: true, itinerary: textResponse });
     } catch (err) {
         console.error("AI Itinerary Error:", err);
         

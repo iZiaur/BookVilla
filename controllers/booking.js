@@ -430,10 +430,14 @@ module.exports.getWelcomeGuide = async (req, res) => {
         if (booking.status !== "Confirmed") {
             return res.json({ success: false, error: 'Welcome guide is only available for confirmed bookings.' });
         }
+        
+        if (booking.aiWelcomeGuide) {
+            return res.json({ success: true, guide: booking.aiWelcomeGuide });
+        }
 
         const prompt = `
         You are a warm, welcoming Airbnb superhost for the property "${booking.listing.title}" located in ${booking.listing.location}.
-        Write a highly personalized, enthusiastic welcome letter for a guest.
+        Write a highly personalized, enthusiastic welcome letter for a guest named ${booking.guestName}.
         Include some quick packing tips and 2-3 local recommendations for things to do or eat in ${booking.listing.location}.
         IMPORTANT: 
         - Use very few emojis (max 2 total). 
@@ -442,16 +446,30 @@ module.exports.getWelcomeGuide = async (req, res) => {
         - Keep it well-structured and under 250 words.
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: prompt,
-        });
+        const { generateText } = require('../utils/aiHelper');
+        const textResponse = await generateText(prompt);
 
-        let htmlResponse = response.text.replace(/```html|```/g, '').trim();
+        let htmlResponse = textResponse.replace(/```html|```/g, '').trim();
+        
+        booking.aiWelcomeGuide = htmlResponse;
+        await booking.save();
 
         res.json({ success: true, guide: htmlResponse });
     } catch (err) {
         console.error("AI Welcome Guide Error:", err);
-        res.status(500).json({ success: false, error: "Failed to generate welcome guide." });
+        
+        const fallbackGuide = `
+        <h5 class="fw-bold mt-3 text-primary">Welcome to ${booking.listing.location}!</h5>
+        <p>Dear ${booking.guestName},</p>
+        <p>We are absolutely thrilled to host you! Our AI assistant is currently taking a little nap, but we wanted to make sure you still receive a warm welcome.</p>
+        <p><strong>Quick Tips:</strong></p>
+        <ul>
+            <li>Check the local weather before packing to ensure you're comfortable during your stay.</li>
+            <li>Don't hesitate to reach out if you need anything at all!</li>
+        </ul>
+        <p>We hope you have an amazing stay!</p>
+        `;
+        
+        res.json({ success: true, guide: fallbackGuide });
     }
 };

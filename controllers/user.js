@@ -126,13 +126,12 @@ module.exports.getHostAnalytics = async (req, res) => {
         ${allReviews.join('\n')}
         `;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.6-flash',
-            contents: prompt,
-        });
+        const { generateText } = require('../utils/aiHelper');
+        const textResponse = await generateText(prompt);
 
         // Convert simple markdown to HTML
-        let htmlResponse = response.text
+        let htmlResponse = textResponse.replace(/```html|```/g, '').trim();
+        htmlResponse = htmlResponse
             .replace(/### (.*)/g, '<h5 class="fw-bold mt-3 text-primary">$1</h5>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/- (.*)/g, '<li>$1</li>');
