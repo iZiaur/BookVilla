@@ -1,8 +1,9 @@
 <style>
 .custom-toast {
     position: fixed;
-    bottom: 2rem;
+    top: 5rem;
     right: 2rem;
+    bottom: auto;
     z-index: 9999;
     padding: 1rem 1.5rem;
     border-radius: 12px;
@@ -12,9 +13,9 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    transform: translateY(100px);
+    transform: translateY(-100px);
     opacity: 0;
-    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideDownFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .custom-toast.error {
     border-left: 5px solid #FF385C;
@@ -22,15 +23,15 @@
 .custom-toast.success {
     border-left: 5px solid #28a745;
 }
-@keyframes slideUpFade {
+@keyframes slideDownFade {
     to {
         transform: translateY(0);
         opacity: 1;
     }
 }
-@keyframes fadeOut {
+@keyframes fadeOutUp {
     to {
-        transform: translateY(20px);
+        transform: translateY(-20px);
         opacity: 0;
     }
 }
@@ -57,16 +58,34 @@
 <% } %>
 
 <script>
-    function closeToast() {
+    window.closeToast = function() {
         const toast = document.getElementById('flash-message');
         if (toast) {
-            toast.style.animation = 'fadeOut 0.3s forwards';
+            toast.style.animation = 'fadeOutUp 0.3s forwards';
             setTimeout(() => toast.remove(), 300);
         }
-    }
+    };
     
-    // Auto-dismiss after 4 seconds
-    setTimeout(() => {
+    // Global function for AJAX calls to trigger a toast
+    window.showToast = function(message, type = 'error') {
         closeToast();
-    }, 4000);
+        const isError = type === 'error';
+        const toastHtml = `
+            <div class="custom-toast ${type}" id="flash-message">
+                <div class="icon-circle ${isError ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'} rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+                    <i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-check'}"></i>
+                </div>
+                <div class="fw-semibold">${message}</div>
+                <button type="button" class="btn-close ms-3" aria-label="Close" onclick="closeToast()"></button>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', toastHtml);
+        setTimeout(closeToast, 4000);
+    };
+    
+    // Auto-dismiss initial server toast after 4 seconds
+    const initialToast = document.getElementById('flash-message');
+    if (initialToast) {
+        setTimeout(() => closeToast(), 4000);
+    }
 </script>

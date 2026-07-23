@@ -135,11 +135,11 @@
             if (data.success) {
                 document.getElementById('price').value = data.price;
             } else {
-                alert("AI service is currently busy. Please enter a price manually.");
+                showToast("AI service is currently busy. Please enter a price manually.");
             }
         } catch (e) {
             console.error(e);
-            alert("AI service is currently busy. Please enter a price manually.");
+            showToast("AI service is currently busy. Please enter a price manually.");
         } finally {
             btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i>';
             btn.disabled = false;
@@ -195,11 +195,11 @@
                         const descField = document.getElementById('description');
                         descField.value = data.description + (descField.value ? "\n\n" + descField.value : "");
                     } else {
-                        alert("AI service is currently busy. Please write the description manually.");
+                        showToast("AI service is currently busy. Please write the description manually.");
                     }
                 } catch (err) {
                     console.error(err);
-                    alert("AI service is currently busy. Please write the description manually.");
+                    showToast("AI service is currently busy. Please write the description manually.");
                 } finally {
                     aiImageBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles me-2"></i>Auto-write Description';
                     aiImageBtn.disabled = false;
