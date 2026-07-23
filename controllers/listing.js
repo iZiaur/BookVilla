@@ -367,6 +367,11 @@ module.exports.generateAIItinerary = async (req, res) => {
         const listing = await Listing.findById(id);
         if (!listing) return res.status(404).json({ error: "Listing not found" });
 
+        // Serve cached itinerary if it exists
+        if (listing.aiItinerary) {
+            return res.json({ success: true, itinerary: listing.aiItinerary });
+        }
+
         const prompt = `
         You are an expert local tour guide. Create a fun, adventurous 2-day travel itinerary for a guest staying in: ${listing.location}, ${listing.country}.
         
@@ -387,17 +392,27 @@ module.exports.generateAIItinerary = async (req, res) => {
             model: 'gemini-3.6-flash',
             contents: prompt,
         });
+        
+        // Cache the response
+        listing.aiItinerary = response.text;
+        await listing.save();
 
-        let htmlResponse = response.text
-            .replace(/### (.*)/g, '<h5 class="fw-bold mt-4 text-primary"><i class="fa-solid fa-map-location-dot me-2"></i>$1</h5>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/- (.*)/g, '<li>$1</li>');
-            
-        htmlResponse = htmlResponse.replace(/(<li>.*<\/li>\n*)+/g, '<ul class="text-body-secondary mb-3">$&</ul>');
-
-        res.json({ success: true, itinerary: htmlResponse });
+        res.json({ success: true, itinerary: response.text });
     } catch (err) {
         console.error("AI Itinerary Error:", err);
-        res.status(500).json({ error: "Failed to generate itinerary" });
+        
+        // General fallback message if AI fails
+        const fallbackMessage = `
+### Quick Local Guide
+
+It looks like our AI planner is currently taking a little break! However, here are some general tips for exploring this beautiful area:
+
+*   **Explore Local Cuisine:** Don't miss out on the local street food and traditional restaurants.
+*   **Sightseeing:** Check out the main cultural landmarks and nature spots.
+*   **Relax:** Take some time to unwind and enjoy the unique vibe of ${listing ? listing.location : "this destination"}.
+
+*(AI services are temporarily under maintenance. Please try generating a personalized itinerary again later.)*`;
+
+        res.json({ success: true, itinerary: fallbackMessage });
     }
 };

@@ -131,11 +131,11 @@
             btn.disabled = true;
 
             try {
-                const response = await fetch('/listings/<%=listing._id%>/ai-itinerary');
+                const response = await fetch(`/listings/<%=listing._id%>/ai-itinerary`);
                 const data = await response.json();
 
                 if (data.success) {
-                    content.innerHTML = data.itinerary;
+                    content.innerHTML = typeof marked !== 'undefined' ? marked.parse(data.itinerary) : data.itinerary;
                     container.classList.remove('d-none');
                     btn.style.display = 'none'; // Hide button after generating
                 } else {
@@ -150,6 +150,7 @@
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
 
     <div class="row btns g-2">

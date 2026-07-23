@@ -39,8 +39,8 @@ const listingSchema=new mongoose.Schema({
     owner:{
         type:Schema.Types.ObjectId,
         ref:'User',
-
     },
+    aiItinerary: String,
     geometry: {
     type: {
       type: String, // Don't do `{ location: { type: String } }`
