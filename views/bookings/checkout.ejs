@@ -62,10 +62,10 @@
 
                     <div class="mb-4">
                         <label for="governmentId" class="form-label fw-bold">Upload Government ID</label>
-                        <p class="small text-muted mb-2">We require a valid ID (Passport, Driver's License, or National ID) for security purposes.</p>
+                        <p class="small text-muted mb-2">We require a valid ID (Passport, Driver's License, or National ID) for security purposes. <b>Max size: 4MB.</b></p>
                         <input class="form-control" type="file" id="governmentId" name="governmentId" accept="image/*" required>
-                        <div class="invalid-feedback">
-                            Please upload a valid Government ID image.
+                        <div class="invalid-feedback" id="governmentIdFeedback">
+                            Please upload a valid Government ID image (Max 4MB).
                         </div>
                     </div>
 
@@ -85,3 +85,36 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const govIdInput = document.getElementById('governmentId');
+    const feedback = document.getElementById('governmentIdFeedback');
+    const form = document.querySelector('form.needs-validation');
+
+    function checkFileSize() {
+        if (govIdInput.files.length > 0) {
+            const fileSize = govIdInput.files[0].size / 1024 / 1024; // in MB
+            if (fileSize > 4) {
+                govIdInput.setCustomValidity("File is too large.");
+                feedback.innerText = "File is too large! Please select an image smaller than 4MB.";
+                return false;
+            } else {
+                govIdInput.setCustomValidity("");
+                feedback.innerText = "Please upload a valid Government ID image (Max 4MB).";
+                return true;
+            }
+        }
+        return true;
+    }
+
+    govIdInput.addEventListener('change', checkFileSize);
+
+    form.addEventListener('submit', function(event) {
+        if (!checkFileSize()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+});
+</script>
