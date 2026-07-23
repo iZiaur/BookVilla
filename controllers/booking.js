@@ -59,7 +59,7 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                 console.error("Failed to generate AI Welcome Guide for email:", aiErr);
             }
 
-            await transporter.sendMail({
+            const mailPromise = transporter.sendMail({
                 from: `"BookVilla Reservations" <${process.env.EMAIL_USER}>`,
                 to: userEmail,
                 subject: "Your Booking Itinerary & Confirmation - BookVilla",
@@ -93,6 +93,8 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 4000));
+            await Promise.race([mailPromise, timeoutPromise]);
             console.log("Confirmation email sent to:", userEmail);
         }
     } catch (err) {
@@ -236,7 +238,7 @@ module.exports.initiateBooking = async (req, res) => {
     
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-            await transporter.sendMail({
+            const mailPromise = transporter.sendMail({
                 from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
                 to: req.user.email,
                 subject: "Action Required: Verify Your Booking",
@@ -246,10 +248,12 @@ module.exports.initiateBooking = async (req, res) => {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 4000));
+            await Promise.race([mailPromise, timeoutPromise]);
         }
     } catch (err) {
-        console.error("Failed to send OTP email:", err);
-        // Continue anyway so testing isn't blocked by missing email creds
+        console.error("Failed to send OTP email or timed out:", err);
+        // Continue anyway so testing isn't blocked by missing email creds or slow SMTP
     }
 
     req.flash('success', 'OTP sent to your email. Please verify to confirm booking.');
@@ -336,7 +340,7 @@ module.exports.resendOTP = async (req, res) => {
 
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-            await transporter.sendMail({
+            const mailPromise = transporter.sendMail({
                 from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
                 to: req.user.email,
                 subject: "Action Required: Verify Your Booking (New OTP)",
@@ -346,9 +350,11 @@ module.exports.resendOTP = async (req, res) => {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 4000));
+            await Promise.race([mailPromise, timeoutPromise]);
         }
     } catch (err) {
-        console.error("Failed to send NEW OTP email:", err);
+        console.error("Failed to send NEW OTP email or timed out:", err);
     }
 
     req.flash('success', 'A new OTP has been sent to your email.');
