@@ -19,7 +19,7 @@ module.exports.index=(async(req,res)=>{
 module.exports.autocomplete = async (req, res) => {
     try {
         const query = req.query.q;
-        if (!query || query.length < 2) return res.json({ suggestions: [] });
+        if (!query || query.length < 1) return res.json({ suggestions: [] });
         
         // Search by location, country, or title
         const regex = new RegExp(query, 'i');

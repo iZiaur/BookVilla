@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(debounceTimer);
         const query = e.target.value.trim();
         
-        if (query.length < 2) {
+        if (query.length < 1) {
             dropdown.innerHTML = '';
             bsDropdown.hide();
             return;
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         debounceTimer = setTimeout(async () => {
             try {
-                const response = await fetch(`/search/autocomplete?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/listings/search/autocomplete?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
                 
                 if (data.suggestions && data.suggestions.length > 0) {
