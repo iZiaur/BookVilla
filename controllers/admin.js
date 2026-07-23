@@ -11,7 +11,16 @@ module.exports.renderDashboard = async (req, res) => {
         const recentListings = await Listing.find({}).populate('owner').sort({ _id: -1 }).limit(10).lean();
         const recentUsers = await User.find({}).sort({ _id: -1 }).limit(10).lean();
 
-        res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentUsers });
+        // Fetch recent bookings for the Activity Log
+        const Booking = require("../models/booking.js");
+        const recentActivity = await Booking.find({})
+            .populate('user')
+            .populate('listing')
+            .sort({ _id: -1 })
+            .limit(50)
+            .lean();
+
+        res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentUsers, recentActivity });
     } catch (err) {
         req.flash("error", "Error loading dashboard.");
         res.redirect("/listings");

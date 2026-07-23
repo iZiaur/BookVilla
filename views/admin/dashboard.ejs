@@ -104,5 +104,80 @@
             <% } %>
         </div>
     </div>
+    
+    <!-- User Activity Tab -->
+    <div class="tab-pane fade" id="activity-tab-pane" role="tabpanel" aria-labelledby="activity-tab" tabindex="0">
+        <h4 class="mb-3">Recent User Activity</h4>
+        <div class="table-responsive bg-white rounded shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Check-In / Out Dates</th>
+                        <th>ID Uploaded</th>
+                        <th>AI Tools Used</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (recentActivity && recentActivity.length > 0) { %>
+                        <% for (let activity of recentActivity) { %>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa-solid fa-circle-user text-secondary fs-4 me-2"></i>
+                                        <div>
+                                            <div class="fw-bold"><%= activity.guestName || (activity.user ? activity.user.username : 'Unknown') %></div>
+                                            <div class="text-muted small"><%= activity.guestEmail || (activity.user ? activity.user.email : '') %></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Booked</span><br>
+                                    <small class="text-muted"><%= activity.listing ? activity.listing.title : 'Deleted Listing' %></small>
+                                </td>
+                                <td>
+                                    <% if (activity.checkIn && activity.checkOut) { %>
+                                        <div class="small">
+                                            <b>In:</b> <%= activity.checkIn.toLocaleDateString() %><br>
+                                            <b>Out:</b> <%= activity.checkOut.toLocaleDateString() %>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="text-muted">-</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (activity.governmentId && activity.governmentId.url) { %>
+                                        <a href="<%= activity.governmentId.url %>" target="_blank" class="badge bg-success text-decoration-none">
+                                            <i class="fa-solid fa-id-card"></i> View ID
+                                        </a>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">Not Uploaded</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (activity.aiWelcomeGuide) { %>
+                                        <span class="badge bg-info text-dark">
+                                            <i class="fa-solid fa-wand-magic-sparkles"></i> Vibe AI Welcome Guide
+                                        </span>
+                                    <% } else { %>
+                                        <span class="text-muted small">-</span>
+                                    <% } %>
+                                </td>
+                                <td class="text-muted small">
+                                    <%= activity.createdAt ? activity.createdAt.toLocaleDateString() : '-' %>
+                                </td>
+                            </tr>
+                        <% } %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No recent activity found.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </div>
