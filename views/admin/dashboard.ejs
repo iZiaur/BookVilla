@@ -79,7 +79,8 @@
                 <div class="col">
                     <div class="card listing-card shadow-sm h-100">
                         <a href="/listings/<%=listing._id%>" class="listing-link" target="_blank">
-                            <img src="<%=listing.image.url%>" class="card-img-top" alt="listing-image" style="height:20rem" >
+                            <% let imgUrl = (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80'; %>
+                            <img src="<%=imgUrl%>" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80';" class="card-img-top" alt="listing-image" style="height:20rem; object-fit: cover;" >
                             <div class="card-img-overlay"></div>
                         </a>
                         <div class="card-body p-3">
