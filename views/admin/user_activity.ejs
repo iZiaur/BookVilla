@@ -1,0 +1,158 @@
+<% layout("/layouts/admin_boilerplate.ejs")%>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-user-shield text-primary me-2"></i> User Activity Report</h2>
+    <a href="/admin" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard</a>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center">
+            <i class="fa-solid fa-circle-user text-secondary" style="font-size: 4rem;"></i>
+            <div class="ms-3">
+                <h3 class="mb-0 fw-bold">@<%= targetUser.username %></h3>
+                <p class="text-muted mb-0 fs-5"><%= targetUser.email %></p>
+                <small class="text-muted">Member since: <%= targetUser._id.getTimestamp().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="reportTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings-tab-pane" type="button" role="tab" aria-selected="true">
+            <i class="fa-solid fa-suitcase-rolling me-1"></i> Bookings (<%= userBookings.length %>)
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="vibeai-tab" data-bs-toggle="tab" data-bs-target="#vibeai-tab-pane" type="button" role="tab" aria-selected="false">
+            <i class="fa-solid fa-wand-magic-sparkles me-1"></i> VibeAI Chat Logs (<%= userActivities.length %>)
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-tab-pane" type="button" role="tab" aria-selected="false">
+            <i class="fa-solid fa-star me-1"></i> Reviews (<%= userReviews.length %>)
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="reportTabsContent">
+    
+    <!-- Bookings Tab -->
+    <div class="tab-pane fade show active" id="bookings-tab-pane" role="tabpanel" tabindex="0">
+        <% if (userBookings.length === 0) { %>
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-suitcase-rolling fs-1 mb-3 text-secondary"></i>
+                <h5>No bookings found for this user.</h5>
+            </div>
+        <% } else { %>
+            <div class="row row-cols-1 g-4">
+                <% for (let booking of userBookings) { %>
+                    <div class="col">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Booked: <%= booking.listing ? booking.listing.title : 'Deleted Listing' %></span>
+                                <span class="badge bg-primary rounded-pill"><%= booking.createdAt.toLocaleDateString() %></span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <h6 class="text-uppercase text-muted small fw-bold mb-2">Booking Details</h6>
+                                        <p class="mb-1"><strong>Check-In:</strong> <%= booking.checkIn ? booking.checkIn.toLocaleDateString() : 'N/A' %></p>
+                                        <p class="mb-1"><strong>Check-Out:</strong> <%= booking.checkOut ? booking.checkOut.toLocaleDateString() : 'N/A' %></p>
+                                        <p class="mb-1"><strong>Guests:</strong> <%= booking.numberOfGuests %></p>
+                                        <p class="mb-0">
+                                            <strong>Govt ID:</strong> 
+                                            <% if (booking.governmentId && booking.governmentId.url) { %>
+                                                <a href="<%= booking.governmentId.url %>" target="_blank" class="text-success text-decoration-none fw-bold"><i class="fa-solid fa-check-circle"></i> Uploaded (View)</a>
+                                            <% } else { %>
+                                                <span class="text-danger"><i class="fa-solid fa-times-circle"></i> Not Uploaded</span>
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 border-start">
+                                        <h6 class="text-uppercase text-muted small fw-bold mb-2">AI Welcome Guide Triggered</h6>
+                                        <% if (booking.aiWelcomeGuidePrompt) { %>
+                                            <div class="p-3 bg-body-tertiary rounded border border-info border-opacity-25" style="font-size: 0.85rem; max-height: 150px; overflow-y: auto;">
+                                                <div class="text-info-emphasis mb-1"><i class="fa-solid fa-robot"></i> <strong>Prompt sent to VibeAI:</strong></div>
+                                                <code class="text-dark" style="white-space: pre-wrap;"><%= booking.aiWelcomeGuidePrompt %></code>
+                                            </div>
+                                        <% } else { %>
+                                            <p class="text-muted fst-italic">No AI Welcome Guide generated for this booking.</p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- VibeAI Chat Logs Tab -->
+    <div class="tab-pane fade" id="vibeai-tab-pane" role="tabpanel" tabindex="0">
+        <% if (userActivities.length === 0) { %>
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-comment-slash fs-1 mb-3 text-secondary"></i>
+                <h5>No VibeAI chat interactions found.</h5>
+            </div>
+        <% } else { %>
+            <div class="card shadow-sm border-0">
+                <ul class="list-group list-group-flush">
+                    <% for (let activity of userActivities) { %>
+                        <li class="list-group-item p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="badge bg-secondary"><%= activity.createdAt.toLocaleString() %></span>
+                                <span class="text-muted small"><%= activity.action %></span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="fw-bold text-primary mb-1"><i class="fa-solid fa-user me-1"></i> User Prompt:</div>
+                                <div class="p-3 bg-primary bg-opacity-10 rounded border border-primary border-opacity-25 shadow-sm">
+                                    <%= activity.details && activity.details.prompt ? activity.details.prompt : 'N/A' %>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="fw-bold text-info mb-1"><i class="fa-solid fa-wand-magic-sparkles me-1"></i> VibeAI Response:</div>
+                                <div class="p-3 bg-info bg-opacity-10 rounded border border-info border-opacity-25 shadow-sm" style="max-height: 200px; overflow-y: auto;">
+                                    <%- activity.details && activity.details.response ? activity.details.response : 'N/A' %>
+                                </div>
+                            </div>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- Reviews Tab -->
+    <div class="tab-pane fade" id="reviews-tab-pane" role="tabpanel" tabindex="0">
+        <% if (userReviews.length === 0) { %>
+            <div class="text-center py-5 text-muted">
+                <i class="fa-regular fa-star fs-1 mb-3 text-secondary"></i>
+                <h5>No reviews authored by this user.</h5>
+            </div>
+        <% } else { %>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <% for (let review of userReviews) { %>
+                    <div class="col">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h6 class="card-title fw-bold">
+                                    Property: <%= review.listing ? review.listing.title : 'Deleted Listing' %>
+                                </h6>
+                                <p class="card-text starability-result" data-rating="<%= review.rating %>"></p>
+                                <p class="card-text text-muted mb-0">"<%= review.comment %>"</p>
+                            </div>
+                            <div class="card-footer bg-white border-0 text-muted small text-end">
+                                Posted: <%= review.createdAt.toLocaleDateString() %>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>

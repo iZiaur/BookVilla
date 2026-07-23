@@ -58,6 +58,7 @@ const bookingSchema = new Schema({
         default: "Pending"
     },
     aiWelcomeGuide: String,
+    aiWelcomeGuidePrompt: String,
     otp: {
         type: String
     },

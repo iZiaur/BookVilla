@@ -133,6 +133,21 @@ module.exports.aiVibeChat = async (req, res) => {
         const textResponse = await generateText(prompt);
 
         let textResponseParsed = textResponse.replace(/```html|```/g, '').trim();
+
+        // Track user activity for the detailed admin report
+        if (req.user) {
+            const Activity = require("../models/activity.js");
+            const newActivity = new Activity({
+                user: req.user._id,
+                action: "VibeAI Chat Interaction",
+                details: {
+                    prompt: message,
+                    response: textResponseParsed
+                }
+            });
+            await newActivity.save();
+        }
+
         res.json({ response: textResponseParsed });
 
     } catch (err) {

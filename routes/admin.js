@@ -12,6 +12,9 @@ router.delete("/listings/:id", isAdmin, wrapAsync(adminController.deleteListing)
 router.delete("/users/:id", isAdmin, wrapAsync(adminController.deleteUser));
 router.delete("/reviews/:id", isAdmin, wrapAsync(adminController.deleteReview));
 
+// Detailed User Activity Report
+router.get("/users/:id/activity", isAdmin, wrapAsync(adminController.renderUserActivityReport));
+
 const Listing = require("../models/listing.js");
 const User = require("../models/user.js");
 

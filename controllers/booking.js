@@ -548,6 +548,7 @@ module.exports.getWelcomeGuide = async (req, res) => {
         let htmlResponse = textResponse.replace(/```html|```/g, '').trim();
         
         booking.aiWelcomeGuide = htmlResponse;
+        booking.aiWelcomeGuidePrompt = prompt;
         await booking.save();
 
         res.json({ success: true, guide: htmlResponse });

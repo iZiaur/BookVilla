@@ -12,10 +12,12 @@ module.exports.renderDashboard = async (req, res) => {
         const recentUsers = await User.find({}).sort({ _id: -1 }).limit(10).lean();
 
         // Fetch recent bookings for the Activity Log
-        const Booking = require("../models/booking.js");
         const recentActivity = await Booking.find({})
             .populate('user')
-            .populate('listing')
+            .populate({
+                path: 'listing',
+                populate: { path: 'owner' }
+            })
             .sort({ _id: -1 })
             .limit(50)
             .lean();
@@ -222,5 +224,36 @@ module.exports.seedListings = async (req, res) => {
     } catch (err) {
         req.flash("error", "Error seeding data.");
         res.redirect("/admin");
+    }
+};
+
+module.exports.renderUserActivityReport = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const User = require("../models/user.js");
+        const Booking = require("../models/booking.js");
+        const Activity = require("../models/activity.js");
+        const Review = require("../models/review.js");
+
+        const targetUser = await User.findById(id);
+        if (!targetUser) {
+            req.flash('error', 'User not found.');
+            return res.redirect('/admin');
+        }
+
+        const userBookings = await Booking.find({ user: id }).populate('listing').sort({ createdAt: -1 });
+        const userActivities = await Activity.find({ user: id }).sort({ createdAt: -1 });
+        const userReviews = await Review.find({ author: id }).populate('listing').sort({ createdAt: -1 });
+
+        res.render("admin/user_activity.ejs", { 
+            targetUser, 
+            userBookings, 
+            userActivities, 
+            userReviews 
+        });
+    } catch (err) {
+        console.error("User Activity Report Error:", err);
+        req.flash('error', 'Error loading user activity report.');
+        res.redirect('/admin');
     }
 };

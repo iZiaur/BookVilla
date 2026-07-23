@@ -124,19 +124,24 @@
                 <tbody>
                     <% if (recentActivity && recentActivity.length > 0) { %>
                         <% for (let activity of recentActivity) { %>
-                            <tr>
+                            <tr onclick="window.location.href='/admin/users/<%= activity.user ? activity.user._id : '' %>/activity'" style="cursor: pointer;">
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="fa-solid fa-circle-user text-secondary fs-4 me-2"></i>
                                         <div>
-                                            <div class="fw-bold"><%= activity.guestName || (activity.user ? activity.user.username : 'Unknown') %></div>
+                                            <div class="fw-bold text-primary"><%= activity.guestName || (activity.user ? activity.user.username : 'Unknown') %></div>
                                             <div class="text-muted small"><%= activity.guestEmail || (activity.user ? activity.user.email : '') %></div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <span class="badge bg-primary">Booked</span><br>
-                                    <small class="text-muted"><%= activity.listing ? activity.listing.title : 'Deleted Listing' %></small>
+                                    <small class="text-muted">
+                                        <%= activity.listing ? activity.listing.title : 'Deleted Listing' %> 
+                                        <% if (activity.listing && activity.listing.owner) { %>
+                                            <br><b>Host:</b> @<%= activity.listing.owner.username || 'Unknown' %>
+                                        <% } %>
+                                    </small>
                                 </td>
                                 <td>
                                     <% if (activity.checkIn && activity.checkOut) { %>
