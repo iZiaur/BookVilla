@@ -93,7 +93,7 @@ const sendConfirmationEmail = async (booking, userEmail) => {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 4000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 8500));
             await Promise.race([mailPromise, timeoutPromise]);
             console.log("Confirmation email sent to:", userEmail);
         }
@@ -248,12 +248,11 @@ module.exports.initiateBooking = async (req, res) => {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 4000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 8500));
             await Promise.race([mailPromise, timeoutPromise]);
         }
     } catch (err) {
         console.error("Failed to send OTP email or timed out:", err);
-        // Continue anyway so testing isn't blocked by missing email creds or slow SMTP
     }
 
     req.flash('success', 'OTP sent to your email. Please verify to confirm booking.');
@@ -350,7 +349,7 @@ module.exports.resendOTP = async (req, res) => {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 4000));
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 8500));
             await Promise.race([mailPromise, timeoutPromise]);
         }
     } catch (err) {
