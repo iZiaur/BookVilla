@@ -40,7 +40,7 @@ async function generateText(prompt) {
                 console.log("Falling back to OpenRouter (Free Llama 3)...");
                 const orResponse = await openrouter.chat.completions.create({
                     messages: [{ role: "user", content: prompt }],
-                    model: "meta-llama/llama-3-8b-instruct:free",
+                    model: "openrouter/free",
                 });
                 return orResponse.choices[0]?.message?.content || "";
             } catch (orError) {
@@ -91,7 +91,7 @@ async function analyzeImage(prompt, imageBase64, mimeType = "image/jpeg") {
                 if (!openrouter) throw new Error("OPENROUTER_API_KEY not found.");
                 console.log("Falling back to OpenRouter Vision (Free Llama 3.2)...");
                 const orResponse = await openrouter.chat.completions.create({
-                    model: "meta-llama/llama-3.2-11b-vision-instruct:free",
+                    model: "nvidia/nemotron-nano-12b-v2-vl:free",
                     messages: [
                         {
                             role: "user",

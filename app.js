@@ -167,7 +167,7 @@ app.get("/test-ai", async (req, res) => {
             const openrouter = new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY, baseURL: "https://openrouter.ai/api/v1" });
             const orResponse = await openrouter.chat.completions.create({
                 messages: [{ role: "user", content: "Say 'Hello from OpenRouter!'" }],
-                model: "meta-llama/llama-3-8b-instruct:free",
+                model: "openrouter/free",
             });
             openaiResult = orResponse.choices[0]?.message?.content;
             openaiStatus = "SUCCESS";
