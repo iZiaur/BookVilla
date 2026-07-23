@@ -27,10 +27,16 @@
             
             <div class="mt-4 pt-4 border-top">
                 <p class="small text-muted mb-2">Total amount to be paid: <span class="fw-bold text-dark">&#8377; <%= booking.totalPrice.toLocaleString("en-IN") %></span></p>
-                <div class="badge bg-danger rounded-pill px-3 py-2 fs-6">
+                <div class="badge bg-danger rounded-pill px-3 py-2 fs-6 mb-3">
                     <i class="fa-regular fa-clock me-2"></i><span id="countdown">05:00</span>
                 </div>
                 <p id="expiredMsg" class="text-danger fw-bold mt-2 d-none">OTP Expired. Please cancel and book again.</p>
+                
+                <form action="/listings/<%= booking.listing._id %>/book/<%= booking._id %>/resend-otp" method="POST" id="resendForm">
+                    <button type="submit" id="resendBtn" class="btn btn-sm btn-outline-primary rounded-pill fw-bold" disabled>
+                        Resend OTP <span id="resendTimer">(02:00)</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -38,10 +44,15 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let timeLeft = 300; // 5 minutes in seconds
+        let timeLeft = 300; // 5 minutes for main expiration
+        let resendLeft = 120; // 2 minutes for resend button
+        
         const countdownEl = document.getElementById('countdown');
         const verifyBtn = document.getElementById('verifyBtn');
         const expiredMsg = document.getElementById('expiredMsg');
+        
+        const resendBtn = document.getElementById('resendBtn');
+        const resendTimerEl = document.getElementById('resendTimer');
         
         const timer = setInterval(() => {
             if (timeLeft <= 0) {
@@ -50,13 +61,26 @@
                 verifyBtn.disabled = true;
                 verifyBtn.innerText = "Expired";
                 expiredMsg.classList.remove('d-none');
+                resendBtn.disabled = true; // Can't resend if completely expired, they should re-book
                 return;
             }
             
+            // Format Main Timer
             let m = Math.floor(timeLeft / 60);
             let s = timeLeft % 60;
             countdownEl.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
             timeLeft--;
+            
+            // Handle Resend Timer
+            if (resendLeft > 0) {
+                let rm = Math.floor(resendLeft / 60);
+                let rs = resendLeft % 60;
+                resendTimerEl.innerText = `(${(rm < 10 ? '0' : '') + rm}:${(rs < 10 ? '0' : '') + rs})`;
+                resendLeft--;
+            } else {
+                resendBtn.disabled = false;
+                resendTimerEl.innerText = "";
+            }
         }, 1000);
     });
 </script>

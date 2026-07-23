@@ -309,6 +309,52 @@ module.exports.verifyOTP = async (req, res) => {
     res.redirect(`/listings/${id}/book/${bookingId}/pay`);
 };
 
+module.exports.resendOTP = async (req, res) => {
+    const { id, bookingId } = req.params;
+    
+    const booking = await Booking.findById(bookingId).populate('listing');
+    
+    if (!booking) {
+        req.flash('error', 'Booking not found.');
+        return res.redirect(`/listings/${id}`);
+    }
+
+    if (booking.status === "Confirmed" || booking.status === "Awaiting Payment") {
+        req.flash('error', 'Booking is already verified or confirmed.');
+        return res.redirect('/profile');
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+
+    booking.otp = otp;
+    booking.otpExpires = otpExpires;
+    await booking.save();
+
+    console.log(`[DEV OTP] Your NEW OTP for booking ${booking._id} is: ${otp}`);
+
+    try {
+        if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+            await transporter.sendMail({
+                from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
+                to: req.user.email,
+                subject: "Action Required: Verify Your Booking (New OTP)",
+                text: `Your new Booking Verification Code for ${booking.listing.title} is: ${otp}. This code expires in 5 minutes.`,
+                html: `<h3>Your Booking Verification Code</h3><p>Use the following new OTP to confirm your booking at <b>${booking.listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 5 minutes.</p>`,
+                headers: {
+                    'X-Entity-Ref-ID': booking._id.toString()
+                }
+            });
+        }
+    } catch (err) {
+        console.error("Failed to send NEW OTP email:", err);
+    }
+
+    req.flash('success', 'A new OTP has been sent to your email.');
+    res.redirect(`/listings/${id}/book/${bookingId}/verify`);
+};
+
 module.exports.renderPayment = async (req, res) => {
     const { id, bookingId } = req.params;
     const booking = await Booking.findById(bookingId).populate('listing');

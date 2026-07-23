@@ -19,6 +19,9 @@ router.get("/:bookingId/verify", isLoggedIn, wrapAsync(bookingController.renderV
 // POST /listings/:id/book/:bookingId/verify
 router.post("/:bookingId/verify", isLoggedIn, wrapAsync(bookingController.verifyOTP));
 
+// POST /listings/:id/book/:bookingId/resend-otp
+router.post("/:bookingId/resend-otp", isLoggedIn, wrapAsync(bookingController.resendOTP));
+
 // GET /listings/:id/book/:bookingId/pay
 router.get("/:bookingId/pay", isLoggedIn, wrapAsync(bookingController.renderPayment));
 
