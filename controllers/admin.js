@@ -58,6 +58,12 @@ module.exports.deleteUser = async (req, res) => {
         // Delete any reviews this user left on other listings
         await Review.deleteMany({ author: id });
         
+        // Delete bookings and activities associated with this user
+        const Booking = require("../models/booking.js");
+        const Activity = require("../models/activity.js");
+        await Booking.deleteMany({ user: id });
+        await Activity.deleteMany({ user: id });
+        
         // Finally, delete the user
         await User.findByIdAndDelete(id);
         
