@@ -117,7 +117,53 @@ app.use('/',userRouter)
 
 app.use('/admin', adminRouter)
 
-/
+app.get("/seed-india", async (req, res) => {
+    try {
+        const indianCities = [
+            { city: "Mumbai", state: "Maharashtra" }, { city: "Delhi", state: "Delhi" },
+            { city: "Bangalore", state: "Karnataka" }, { city: "Hyderabad", state: "Telangana" },
+            { city: "Ahmedabad", state: "Gujarat" }, { city: "Chennai", state: "Tamil Nadu" },
+            { city: "Kolkata", state: "West Bengal" }, { city: "Pune", state: "Maharashtra" },
+            { city: "Jaipur", state: "Rajasthan" }, { city: "Lucknow", state: "Uttar Pradesh" },
+            { city: "Kanpur", state: "Uttar Pradesh" }, { city: "Nagpur", state: "Maharashtra" },
+            { city: "Indore", state: "Madhya Pradesh" }, { city: "Thane", state: "Maharashtra" },
+            { city: "Bhopal", state: "Madhya Pradesh" }, { city: "Visakhapatnam", state: "Andhra Pradesh" },
+            { city: "Pimpri-Chinchwad", state: "Maharashtra" }, { city: "Patna", state: "Bihar" },
+            { city: "Vadodara", state: "Gujarat" }, { city: "Ghaziabad", state: "Uttar Pradesh" }
+        ];
+        const categories = ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools"];
+        const Booking = require("./models/booking.js");
+        const user = await User.findOne({});
+        if (!user) return res.send("No user found to assign as owner.");
+
+        for (let i = 0; i < indianCities.length; i++) {
+            const cityData = indianCities[i];
+            const guests = Math.floor(Math.random() * 12) + 1;
+            const price = Math.floor(Math.random() * 5000) + 1000;
+            const listing = new Listing({
+                title: `Beautiful Stay in ${cityData.city}`,
+                description: `Experience the best of ${cityData.city}, ${cityData.state} with our wonderful accommodation.`,
+                image: { url: "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhvdGVsfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60", filename: "listingimage" },
+                price: price.toString(), location: cityData.city, country: "India", address: `123 Main St, ${cityData.city}, ${cityData.state}, India`,
+                category: categories[Math.floor(Math.random() * categories.length)], maxGuests: guests, owner: user._id,
+                geometry: { type: "Point", coordinates: [77.2090, 28.6139] }
+            });
+            await listing.save();
+            if (i < 5) {
+                const checkIn = new Date(); checkIn.setDate(checkIn.getDate() + 1);
+                const checkOut = new Date(); checkOut.setDate(checkOut.getDate() + 5);
+                await new Booking({
+                    user: user._id, listing: listing._id, checkIn, checkOut,
+                    guestName: "Test Guest", guestEmail: "test@example.com", numberOfGuests: 2,
+                    totalPrice: price * 4, consentGiven: true, status: "Confirmed"
+                }).save();
+            }
+        }
+        res.send("Seeding complete! You can now test the search filters on the homepage.");
+    } catch (err) {
+        res.send("Error seeding data: " + err.message);
+    }
+});
 
 // Encountering error in page not found 
 
