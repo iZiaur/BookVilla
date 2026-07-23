@@ -54,9 +54,9 @@
                 <div class="vr mx-2 text-secondary"></div>
                 
                 <!-- Dates Input -->
-                <input type="date" name="checkIn" class="form-control bg-transparent border-0 shadow-none px-1" title="Check-in Date" style="font-size: 0.9rem;">
+                <input type="text" id="checkInInput" name="checkIn" class="form-control bg-transparent border-0 shadow-none px-1 text-center" placeholder="From" style="font-size: 0.9rem; width: 100px;">
                 <span class="text-muted mx-1">-</span>
-                <input type="date" name="checkOut" class="form-control bg-transparent border-0 shadow-none px-1" title="Check-out Date" style="font-size: 0.9rem;">
+                <input type="text" id="checkOutInput" name="checkOut" class="form-control bg-transparent border-0 shadow-none px-1 text-center" placeholder="To" style="font-size: 0.9rem; width: 100px;">
                 
                 <div class="vr mx-2 text-secondary"></div>
                 
@@ -145,5 +145,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Make location optional since dates and guests are other ways to search
     searchInput.required = false;
+
+    // Initialize Flatpickr for date inputs
+    if (typeof flatpickr !== 'undefined') {
+        const checkInPicker = flatpickr("#checkInInput", {
+            altInput: true,
+            altFormat: "d M Y",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            onChange: function(selectedDates, dateStr, instance) {
+                checkOutPicker.set("minDate", selectedDates[0] ? new Date(selectedDates[0]).fp_incr(1) : "today");
+            }
+        });
+
+        const checkOutPicker = flatpickr("#checkOutInput", {
+            altInput: true,
+            altFormat: "d M Y",
+            dateFormat: "Y-m-d",
+            minDate: "today"
+        });
+    }
 });
 </script>
