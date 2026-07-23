@@ -36,27 +36,27 @@
         </div>
     </div>
     
-    <!-- Users Management Tab -->
-    <div class="tab-pane fade" id="users-tab-pane" role="tabpanel" aria-labelledby="users-tab" tabindex="0">
-        <h4 class="mb-3">Recent Users</h4>
+    <!-- Guests Dashboard Tab -->
+    <div class="tab-pane fade" id="guests-tab-pane" role="tabpanel" aria-labelledby="guests-tab" tabindex="0">
+        <h4 class="mb-3">Recent Guests</h4>
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            <% for (let user of recentUsers) { %>
+            <% for (let user of recentGuests) { %>
                 <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
+                    <div class="card h-100 shadow-sm border-0 border-top border-primary border-4">
                         <div class="card-body text-center p-4">
                             <div class="mb-3">
-                                <i class="fa-solid fa-circle-user text-secondary" style="font-size: 3rem;"></i>
+                                <i class="fa-solid fa-user text-secondary" style="font-size: 3rem;"></i>
                             </div>
                             <h5 class="card-title fw-bold">@<%= user.username %></h5>
+                            <span class="badge bg-primary mb-2">Guest</span>
                             <p class="card-text text-muted mb-1"><%= user.email %></p>
                             <p class="card-text text-muted mb-3" style="font-size: 0.85rem;">
                                 <i class="fa-regular fa-clock me-1"></i> Joined: <%= user._id.getTimestamp().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
                             </p>
                             
-                            <!-- Prevent admin from deleting themselves -->
                             <% if (user.email.toLowerCase().trim() !== process.env.ADMIN_EMAIL.toLowerCase().trim()) { %>
-                                <form method="POST" action="/admin/users/<%= user._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this user? ALL their listings and reviews will be permanently deleted as well.');">
-                                    <button class="btn btn-outline-danger w-100"><i class="fa-solid fa-trash me-1"></i> Delete User</button>
+                                <form method="POST" action="/admin/users/<%= user._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this guest? ALL their bookings and activities will be permanently deleted.');">
+                                    <button class="btn btn-outline-danger w-100"><i class="fa-solid fa-trash me-1"></i> Delete Guest</button>
                                 </form>
                             <% } else { %>
                                 <span class="badge bg-secondary w-100 py-2">Super Admin</span>
@@ -65,8 +65,43 @@
                     </div>
                 </div>
             <% } %>
-            <% if (recentUsers.length === 0) { %>
-                <div class="col-12"><p class="text-muted">No users found.</p></div>
+            <% if (recentGuests.length === 0) { %>
+                <div class="col-12"><p class="text-muted">No guests found.</p></div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Owners Dashboard Tab -->
+    <div class="tab-pane fade" id="owners-tab-pane" role="tabpanel" aria-labelledby="owners-tab" tabindex="0">
+        <h4 class="mb-3">Recent Owners (Hosts)</h4>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <% for (let user of recentOwners) { %>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 border-top border-success border-4">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fa-solid fa-user-tie text-success" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">@<%= user.username %></h5>
+                            <span class="badge bg-success mb-2">Property Owner</span>
+                            <p class="card-text text-muted mb-1"><%= user.email %></p>
+                            <p class="card-text text-muted mb-3" style="font-size: 0.85rem;">
+                                <i class="fa-regular fa-clock me-1"></i> Joined: <%= user._id.getTimestamp().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                            </p>
+                            
+                            <% if (user.email.toLowerCase().trim() !== process.env.ADMIN_EMAIL.toLowerCase().trim()) { %>
+                                <form method="POST" action="/admin/users/<%= user._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this owner? ALL their listings, bookings, and reviews will be permanently deleted.');">
+                                    <button class="btn btn-outline-danger w-100"><i class="fa-solid fa-trash me-1"></i> Delete Owner</button>
+                                </form>
+                            <% } else { %>
+                                <span class="badge bg-secondary w-100 py-2">Super Admin</span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            <% if (recentOwners.length === 0) { %>
+                <div class="col-12"><p class="text-muted">No owners found.</p></div>
             <% } %>
         </div>
     </div>

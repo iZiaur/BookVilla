@@ -9,18 +9,24 @@ module.exports.renderDashboard = async (req, res) => {
         const totalReviews = await Review.countDocuments();
 
         const recentListings = await Listing.find({}).populate('owner').sort({ _id: -1 }).limit(10).lean();
-        const recentUsers = await User.find({}).sort({ _id: -1 }).limit(10).lean();
 
         // Fetch recent bookings for the Activity Log
         const Booking = require("../models/booking.js");
         const Activity = require("../models/activity.js");
 
-        // Background cleanup for orphaned bookings/activities (from previously deleted users)
+        // Background cleanup for orphaned bookings/activities and role migration
         (async () => {
             try {
                 const userIds = await User.find().distinct('_id');
                 await Booking.deleteMany({ user: { $nin: userIds } });
                 await Activity.deleteMany({ user: { $nin: userIds } });
+                
+                // One-time role migration: mark users with listings as owners
+                const ownersList = await Listing.find().distinct('owner');
+                await User.updateMany(
+                    { _id: { $in: ownersList }, role: { $ne: 'owner' } },
+                    { $set: { role: 'owner' } }
+                );
             } catch (e) {
                 console.error("Cleanup error:", e);
             }
@@ -38,7 +44,10 @@ module.exports.renderDashboard = async (req, res) => {
         // Filter out any that might have been fetched before the cleanup finished
         const validActivity = recentActivity.filter(a => a.user != null).slice(0, 50);
 
-        res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentUsers, recentActivity: validActivity });
+        const recentGuests = await User.find({ role: { $ne: 'owner' } }).sort({ _id: -1 }).limit(10).lean();
+        const recentOwners = await User.find({ role: 'owner' }).sort({ _id: -1 }).limit(10).lean();
+
+        res.render("admin/dashboard.ejs", { totalListings, totalUsers, totalReviews, recentListings, recentGuests, recentOwners, recentActivity: validActivity });
     } catch (err) {
         req.flash("error", "Error loading dashboard.");
         res.redirect("/listings");

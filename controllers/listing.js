@@ -256,12 +256,19 @@ module.exports.createListing=(async(req,res,next)=>{
             .send()
         let url=req.file.path;
         let fileName=req.file.filename
-        const newListing=new Listing(req.body.listing);
-            newListing.owner=req.user._id;
-            newListing.geometry=coordinates.body.features[0].geometry
-            newListing.image={url,fileName}
-            let savedListing=await newListing.save();
-            console.log(savedListing);
+        const newListing = new Listing(req.body.listing);
+        newListing.owner = req.user._id;
+        newListing.geometry = coordinates.body.features[0].geometry
+        newListing.image = { url, fileName }
+        let savedListing = await newListing.save();
+        
+        // Upgrade user role to owner if they aren't one already
+        if (req.user.role !== 'owner' && req.user.role !== 'admin') {
+            const User = require("../models/user.js");
+            await User.findByIdAndUpdate(req.user._id, { role: 'owner' });
+        }
+        
+        console.log(savedListing);
             req.flash("success","New Listing Created!");
             res.redirect("/listings" );
 })

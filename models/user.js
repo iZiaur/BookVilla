@@ -10,6 +10,11 @@ const userSchema=new Schema({
     phone: {
         type: String,
         default: 'Not provided'
+    },
+    role: {
+        type: String,
+        enum: ['guest', 'owner', 'admin'],
+        default: 'guest'
     }
 })
 userSchema.plugin(passportLocalMongooose);
