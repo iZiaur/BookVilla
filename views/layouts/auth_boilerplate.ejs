@@ -19,8 +19,7 @@
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: flex-end; /* Move card to the right */
-            padding-right: 5%; /* Add some spacing from the right edge */
+            justify-content: center;
             position: relative;
             overflow: hidden; /* Prevent scrollbar from scaled pseudo-element */
         }
@@ -75,24 +74,11 @@
         .auth-logo:hover {
             color: #bb2d3b;
         }
-
-        .flash-container {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 600px;
-        }
     </style>
 </head>
 <body>
-
+    <%- include("../includes/flash.ejs") %>
     <div class="auth-bg">
-        <div class="flash-container">
-            <%- include("../includes/flash.ejs") %>
-        </div>
         
         <div class="glass-card">
             <a href="/listings" class="auth-logo"><i class="fa-regular fa-compass"></i> BookVilla</a>
