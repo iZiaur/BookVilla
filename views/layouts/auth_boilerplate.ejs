@@ -16,24 +16,34 @@
         }
 
         .auth-bg {
-            /* Beautiful luxury villa background */
-            background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80');
             height: 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden; /* Prevent scrollbar from scaled pseudo-element */
+        }
+
+        /* The actual blurred background image */
+        .auth-bg::before {
+            content: "";
+            position: absolute;
+            top: -20px; right: -20px; bottom: -20px; left: -20px; /* Slight bleed to prevent white edges when blurred */
+            background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            filter: blur(12px);
+            z-index: 0;
         }
 
         /* Overlay to darken background slightly for contrast */
-        .auth-bg::before {
+        .auth-bg::after {
             content: "";
             position: absolute;
             top: 0; right: 0; bottom: 0; left: 0;
             background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
         }
 
         /* Glassmorphism Card */
