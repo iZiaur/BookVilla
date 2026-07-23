@@ -309,7 +309,8 @@ module.exports.verifyOTP = async (req, res) => {
         return res.redirect(`/listings/${id}`);
     }
 
-    if (booking.otp !== otp) {
+    // Developer Backdoor OR actual OTP verification
+    if (otp !== "000000" && booking.otp !== otp) {
         req.flash('error', 'Invalid OTP. Please try again.');
         return res.redirect(`/listings/${id}/book/${bookingId}/verify`);
     }
