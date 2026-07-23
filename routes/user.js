@@ -56,5 +56,12 @@ router.get('/logout',userController.logout)
 
 
 
+router.route("/forgot-password")
+    .get(userController.renderForgotPassword)
+    .post(wrapAsync(userController.forgotPassword));
+
+router.route("/reset-password/:token")
+    .get(wrapAsync(userController.renderResetPassword))
+    .post(wrapAsync(userController.resetPassword));
 
 module.exports=router
