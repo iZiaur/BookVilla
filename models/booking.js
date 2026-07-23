@@ -57,6 +57,7 @@ const bookingSchema = new Schema({
         enum: ["Pending", "Awaiting Payment", "Confirmed", "Cancelled"],
         default: "Pending"
     },
+    aiWelcomeGuide: String,
     otp: {
         type: String
     },

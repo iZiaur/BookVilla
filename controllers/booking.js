@@ -8,9 +8,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'mock_key' })
 
 // Setup Nodemailer transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
