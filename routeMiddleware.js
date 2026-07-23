@@ -7,6 +7,18 @@ module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         req.session.redirectUrl = req.originalUrl;  
         req.flash('error', 'You must be logged in');
+        
+        // Try to keep them on the current page and trigger the modal
+        const referer = req.get('Referrer');
+        if (referer && !referer.includes('/login')) {
+            try {
+                const url = new URL(referer);
+                url.searchParams.set('auth', 'login');
+                return res.redirect(url.toString());
+            } catch (e) {
+                return res.redirect('/login');
+            }
+        }
         return res.redirect('/login');
     }
     next();
