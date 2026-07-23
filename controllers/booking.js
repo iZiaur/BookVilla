@@ -232,31 +232,41 @@ module.exports.initiateBooking = async (req, res) => {
 
     await booking.save();
 
-    // In a real app, send email here. Since it's a test/portfolio app without real SMTP credentials by default, 
-    // we will mock it or just log it so the user can test easily.
-    console.log(`[DEV OTP] Your OTP for booking ${booking._id} is: ${otp}`);
+    // We skip sending the email here because Cloudinary upload + Nodemailer combined exceed Vercel's 10s limit.
+    // Instead, we let the frontend trigger the email via a separate endpoint after the page loads.
+    req.flash('success', 'Booking created! Please verify your email.');
+    res.redirect(`/listings/${id}/book/${booking._id}/verify?initial=true`);
+};
+
+module.exports.triggerInitialEmail = async (req, res) => {
+    const { id, bookingId } = req.params;
+    const booking = await Booking.findById(bookingId).populate('listing');
     
+    if (!booking || booking.status !== "Pending") {
+        return res.json({ success: false, message: "Invalid booking" });
+    }
+
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             const mailPromise = transporter.sendMail({
                 from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
                 to: req.user.email,
                 subject: "Action Required: Verify Your Booking",
-                text: `Your Booking Verification Code for ${listing.title} is: ${otp}. This code expires in 5 minutes.`,
-                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 5 minutes.</p>`,
+                text: `Your Booking Verification Code for ${booking.listing.title} is: ${booking.otp}. This code expires in 5 minutes.`,
+                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${booking.listing.title}</b>:</p><h2>${booking.otp}</h2><p>This code expires in 5 minutes.</p>`,
                 headers: {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
             });
             const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Email timeout')), 8500));
             await Promise.race([mailPromise, timeoutPromise]);
+            return res.json({ success: true });
         }
+        return res.json({ success: false, message: "No email config" });
     } catch (err) {
-        console.error("Failed to send OTP email or timed out:", err);
+        console.error("Failed to send initial OTP email:", err);
+        return res.json({ success: false, error: err.message });
     }
-
-    req.flash('success', 'OTP sent to your email. Please verify to confirm booking.');
-    res.redirect(`/listings/${id}/book/${booking._id}/verify`);
 };
 
 module.exports.renderVerify = async (req, res) => {

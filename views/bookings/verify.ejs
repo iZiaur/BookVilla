@@ -82,5 +82,16 @@
                 resendTimerEl.innerText = "";
             }
         }, 1000);
+
+        // Async Email Trigger to prevent Vercel timeouts
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('initial') === 'true') {
+            fetch(`/listings/<%= booking.listing._id %>/book/<%= booking._id %>/trigger-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).catch(console.error);
+            // Remove 'initial' from URL so a refresh doesn't trigger it again
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     });
 </script>
