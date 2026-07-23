@@ -249,11 +249,24 @@ module.exports.triggerInitialEmail = async (req, res) => {
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             const mailPromise = transporter.sendMail({
-                from: `"BookVilla Security" <${process.env.EMAIL_SENDER || process.env.EMAIL_USER}>`,
+                from: `"BookVilla Support" <${process.env.EMAIL_USER}>`,
+                replyTo: process.env.EMAIL_USER,
                 to: req.user.email,
-                subject: "Action Required: Verify Your Booking",
-                text: `Your Booking Verification Code for ${booking.listing.title} is: ${booking.otp}. This code expires in 5 minutes.`,
-                html: `<h3>Your Booking Verification Code</h3><p>Use the following OTP to confirm your booking at <b>${booking.listing.title}</b>:</p><h2>${booking.otp}</h2><p>This code expires in 5 minutes.</p>`,
+                subject: `Verify Your Booking at ${booking.listing.title} - BookVilla`,
+                text: `Hello,\n\nYour Booking Verification Code for ${booking.listing.title} is: ${booking.otp}\n\nThis code expires in 5 minutes.\n\nThank you,\nBookVilla Team`,
+                html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 8px;">
+                    <h2 style="color: #333;">Verify Your Booking</h2>
+                    <p style="font-size: 16px; color: #555;">Hello,</p>
+                    <p style="font-size: 16px; color: #555;">Use the following verification code to confirm your booking at <strong>${booking.listing.title}</strong>:</p>
+                    <div style="background-color: #f4f4f4; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
+                        <span style="font-size: 24px; font-weight: bold; color: #000; letter-spacing: 2px;">${booking.otp}</span>
+                    </div>
+                    <p style="font-size: 14px; color: #777;">This code expires in 5 minutes. If you did not request this, please ignore this email.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #999;">Best regards,<br>BookVilla Team</p>
+                </div>
+                `,
                 headers: {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
@@ -351,11 +364,24 @@ module.exports.resendOTP = async (req, res) => {
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             const mailPromise = transporter.sendMail({
-                from: `"BookVilla Security" <${process.env.EMAIL_SENDER || process.env.EMAIL_USER}>`,
+                from: `"BookVilla Support" <${process.env.EMAIL_USER}>`,
+                replyTo: process.env.EMAIL_USER,
                 to: req.user.email,
-                subject: "Action Required: Verify Your Booking (New OTP)",
-                text: `Your new Booking Verification Code for ${booking.listing.title} is: ${otp}. This code expires in 5 minutes.`,
-                html: `<h3>Your Booking Verification Code</h3><p>Use the following new OTP to confirm your booking at <b>${booking.listing.title}</b>:</p><h2>${otp}</h2><p>This code expires in 5 minutes.</p>`,
+                subject: `New Verification Code for ${booking.listing.title} - BookVilla`,
+                text: `Hello,\n\nYour new Booking Verification Code for ${booking.listing.title} is: ${otp}\n\nThis code expires in 5 minutes.\n\nThank you,\nBookVilla Team`,
+                html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 8px;">
+                    <h2 style="color: #333;">New Verification Code</h2>
+                    <p style="font-size: 16px; color: #555;">Hello,</p>
+                    <p style="font-size: 16px; color: #555;">Use the following new verification code to confirm your booking at <strong>${booking.listing.title}</strong>:</p>
+                    <div style="background-color: #f4f4f4; padding: 15px; text-align: center; border-radius: 5px; margin: 20px 0;">
+                        <span style="font-size: 24px; font-weight: bold; color: #000; letter-spacing: 2px;">${otp}</span>
+                    </div>
+                    <p style="font-size: 14px; color: #777;">This code expires in 5 minutes. If you did not request this, please ignore this email.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #999;">Best regards,<br>BookVilla Team</p>
+                </div>
+                `,
                 headers: {
                     'X-Entity-Ref-ID': booking._id.toString()
                 }
