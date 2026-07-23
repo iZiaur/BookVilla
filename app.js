@@ -175,6 +175,18 @@ app.get("/test-ai", async (req, res) => {
             openaiResult = e.message;
             openaiStatus = "FAILED";
         }
+
+        // Test aiHelper itself
+        let helperResult = "Not tested";
+        let helperStatus = "pending";
+        try {
+            const { generateText } = require('./utils/aiHelper');
+            helperResult = await generateText("Say 'Hello from aiHelper!'");
+            helperStatus = "SUCCESS";
+        } catch (e) {
+            helperResult = e.message;
+            helperStatus = "FAILED";
+        }
         
         res.send(`
             <h1>AI API Diagnostic Test</h1>
@@ -186,9 +198,13 @@ app.get("/test-ai", async (req, res) => {
                 <h2>2. Groq Status (Fallback): ${groqStatus}</h2>
                 <p><strong>Response:</strong> ${groqResult}</p>
             </div>
-            <div style="padding: 20px; border: 2px solid ${openaiStatus === 'SUCCESS' ? 'green' : 'red'};">
+            <div style="padding: 20px; border: 2px solid ${openaiStatus === 'SUCCESS' ? 'green' : 'red'}; margin-bottom: 20px;">
                 <h2>3. OpenRouter Status (Free Tertiary Fallback): ${openaiStatus}</h2>
                 <p><strong>Response:</strong> ${openaiResult}</p>
+            </div>
+            <div style="padding: 20px; border: 2px solid ${helperStatus === 'SUCCESS' ? 'green' : 'red'};">
+                <h2>4. aiHelper Full Chain Status: ${helperStatus}</h2>
+                <p><strong>Response:</strong> ${helperResult}</p>
             </div>
         `);
     } catch (e) {
