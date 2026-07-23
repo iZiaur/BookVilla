@@ -274,7 +274,13 @@ module.exports.renderUserActivityReport = async (req, res) => {
 
         const userBookings = await Booking.find({ user: id }).populate('listing').sort({ createdAt: -1 });
         const userActivities = await Activity.find({ user: id }).sort({ createdAt: -1 });
-        const userReviews = await Review.find({ author: id }).populate('listing').sort({ createdAt: -1 });
+        
+        // Fetch reviews and manually attach their corresponding listing
+        const rawReviews = await Review.find({ author: id }).sort({ createdAt: -1 }).lean();
+        const userReviews = await Promise.all(rawReviews.map(async (r) => {
+            const listing = await Listing.findOne({ reviews: r._id }, 'title').lean();
+            return { ...r, listing };
+        }));
 
         res.render("admin/user_activity.ejs", { 
             targetUser, 
