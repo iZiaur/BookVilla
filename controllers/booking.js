@@ -62,7 +62,7 @@ const sendConfirmationEmail = async (booking, userEmail) => {
             }
 
             const mailPromise = transporter.sendMail({
-                from: `"BookVilla Reservations" <${process.env.EMAIL_USER}>`,
+                from: `"BookVilla Reservations" <${process.env.EMAIL_SENDER || process.env.EMAIL_USER}>`,
                 to: userEmail,
                 subject: "Your Booking Itinerary & Confirmation - BookVilla",
                 text: `Hi ${booking.guestName}, your payment was successful and your reservation at ${booking.listing.title} is confirmed. Check-in: ${new Date(booking.checkIn).toLocaleDateString()}. Total Paid: ₹${finalPrice}. Log in to view your full itinerary and welcome guide.`,
@@ -251,7 +251,7 @@ module.exports.triggerInitialEmail = async (req, res) => {
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             const mailPromise = transporter.sendMail({
-                from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
+                from: `"BookVilla Security" <${process.env.EMAIL_SENDER || process.env.EMAIL_USER}>`,
                 to: req.user.email,
                 subject: "Action Required: Verify Your Booking",
                 text: `Your Booking Verification Code for ${booking.listing.title} is: ${booking.otp}. This code expires in 5 minutes.`,
@@ -353,7 +353,7 @@ module.exports.resendOTP = async (req, res) => {
     try {
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             const mailPromise = transporter.sendMail({
-                from: `"BookVilla Security" <${process.env.EMAIL_USER}>`,
+                from: `"BookVilla Security" <${process.env.EMAIL_SENDER || process.env.EMAIL_USER}>`,
                 to: req.user.email,
                 subject: "Action Required: Verify Your Booking (New OTP)",
                 text: `Your new Booking Verification Code for ${booking.listing.title} is: ${otp}. This code expires in 5 minutes.`,
