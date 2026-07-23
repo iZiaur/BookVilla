@@ -113,8 +113,64 @@ app.use("/listings",listingRouter);
 
 app.use("/listings/:id/reviews",reviewRouter)
 app.use("/listings/:id/book", bookingRouter);
+app.use("/", userRouter);
 
-app.use('/',userRouter)
+app.get("/test-ai", async (req, res) => {
+    try {
+        const { GoogleGenAI } = require('@google/genai');
+        const Groq = require("groq-sdk");
+        
+        let geminiResult = "Not tested";
+        let groqResult = "Not tested";
+        let geminiStatus = "pending";
+        let groqStatus = "pending";
+        
+        // Test Gemini
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+            const response = await ai.models.generateContent({
+                model: 'gemini-3.6-flash',
+                contents: "Say 'Hello from Gemini!'",
+            });
+            geminiResult = response.text;
+            geminiStatus = "SUCCESS";
+        } catch (e) {
+            geminiResult = e.message;
+            geminiStatus = "FAILED";
+        }
+        
+        // Test Groq
+        try {
+            if (!process.env.GROQ_API_KEY) {
+                throw new Error("GROQ_API_KEY is not set in environment variables");
+            }
+            const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+            const groqResponse = await groq.chat.completions.create({
+                messages: [{ role: "user", content: "Say 'Hello from Groq!'" }],
+                model: "llama-3.3-70b-versatile",
+            });
+            groqResult = groqResponse.choices[0]?.message?.content;
+            groqStatus = "SUCCESS";
+        } catch (e) {
+            groqResult = e.message;
+            groqStatus = "FAILED";
+        }
+        
+        res.send(`
+            <h1>AI API Diagnostic Test</h1>
+            <div style="padding: 20px; border: 2px solid ${geminiStatus === 'SUCCESS' ? 'green' : 'red'}; margin-bottom: 20px;">
+                <h2>Gemini Status: ${geminiStatus}</h2>
+                <p><strong>Response:</strong> ${geminiResult}</p>
+            </div>
+            <div style="padding: 20px; border: 2px solid ${groqStatus === 'SUCCESS' ? 'green' : 'red'};">
+                <h2>Groq Status: ${groqStatus}</h2>
+                <p><strong>Response:</strong> ${groqResult}</p>
+            </div>
+        `);
+    } catch (e) {
+        res.send("Critical test failure: " + e.message);
+    }
+});
 
 app.use('/admin', adminRouter)
 
